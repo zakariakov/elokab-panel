@@ -46,14 +46,16 @@ StatusLabel::StatusLabel(QColor nextColor, QColor prevColor, QWidget *parent, in
 
 
     setMinimumWidth(7);
-    QString styleSt;
 
+if(style>0&&style<6){
+     QString styleSt;
     if(parent->isRightToLeft())
         styleSt= MyStyle::statusStyle(style).arg(prevColor.name()).arg(nextColor.name());
     else
         styleSt=  MyStyle::statusStyle(style).arg(nextColor.name()).arg(prevColor.name());
 
     setStyleSheet(styleSt);
+}
 
 
 }
@@ -112,8 +114,10 @@ QString StatusLabel::updateCommand()
         //        if(s.isEmpty())
         //            s=list.first();
     }
-    if(!err.isEmpty())
-        qDebug()<<"Error command"<<mName<<err;
+
+    //TODO add this
+//    if(!err.isEmpty())
+//        qDebug()<<"Error command"<<mName<<err;
 
     setText(QString(" %1 %2 ").arg(mLabel).arg(s.trimmed()));
 

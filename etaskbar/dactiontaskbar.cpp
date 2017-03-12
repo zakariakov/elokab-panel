@@ -31,7 +31,7 @@ DActionTaskbar::DActionTaskbar(const Window window, QWidget *parent) :
           m_Window(window)
 {
           this->setCheckable(true);
-    this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
+    this->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
     QFont font=parent->font();
    font.setPointSize(parent->font().pointSize());
 

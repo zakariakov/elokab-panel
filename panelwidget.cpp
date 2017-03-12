@@ -31,8 +31,8 @@ PanelWidget::PanelWidget(QWidget *parent) :
 
     mDtaskbarWidget=new DtaskbarWidget(this);
     mSysTray=new SysTray;
-ui->horizontalLayout->setSpacing(0);
-     ui->horizontalLayout->addWidget(mMenuApplications);
+    ui->horizontalLayout->setSpacing(0);
+    ui->horizontalLayout->addWidget(mMenuApplications);
     ui->horizontalLayout->addWidget(mDtaskbarWidget);
     ui->horizontalLayout->addWidget(mStatusWidget);
     ui->horizontalLayout->addWidget(mSysTray);
@@ -51,10 +51,14 @@ ui->horizontalLayout->setSpacing(0);
 
 }
 
+
+
 PanelWidget::~PanelWidget()
 {
     delete ui;
 }
+
+
 void PanelWidget::reconfigure()
 {
     qDebug()<<"called reconfigura";
@@ -62,7 +66,7 @@ void PanelWidget::reconfigure()
    mMenuApplications->loadSettings();
    mDtaskbarWidget->loadSettings();
    mStatusWidget->loadSettings();
-    resizePanel();
+   // resizePanel();
 }
 void PanelWidget::showMenu()
 {

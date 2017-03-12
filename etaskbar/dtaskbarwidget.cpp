@@ -34,11 +34,11 @@ DtaskbarWidget::DtaskbarWidget(QWidget *parent):
     m_horizontalLayout->setSpacing(0);
     m_horizontalLayout->setContentsMargins(0,0,0,0);
     m_horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-    m_horizontalLayout->addSpacing(10);
+    m_horizontalLayout->addSpacing(3);
 
     horizontalSpacer = new QSpacerItem(5, 5, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-
+   m_horizontalLayout->addItem(horizontalSpacer);
 
     //     connect(KWindowSystem::self(), SIGNAL(stackingOrderChanged()), SLOT(refreshTaskList()));
     //        connect(KWindowSystem::self(), static_cast<void (KWindowSystem::*)(WId, NET::Properties, NET::Properties2)>(&KWindowSystem::windowChanged)
@@ -48,14 +48,21 @@ DtaskbarWidget::DtaskbarWidget(QWidget *parent):
 
 
 
-    loadSettings();
-    qApp->installNativeEventFilter(this);
 
-    refreshTaskList();
-    //   this->setStyleSheet("QWidget{background-color: red  ;}");
+  //  qApp->installNativeEventFilter(this);
+
+QTimer::singleShot(100,this,SLOT(init()));
+
+  //   this->setStyleSheet("QWidget{background-color: red  ;}");
 
 }
 
+void DtaskbarWidget::init()
+{
+
+     qApp->installNativeEventFilter(this);
+      loadSettings();
+}
 
 bool DtaskbarWidget::nativeEventFilter(const QByteArray &eventType, void *message, long *)
 {
@@ -180,8 +187,11 @@ void DtaskbarWidget::loadSettings()
     }
 
     m_size=(QSize(IconSize,IconSize));
-
-    QString  mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor).arg(ActiveBgColor).arg(ActiveFgColor);
+  QString  mystyle;
+  if(Style<1||Style>5)
+      mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor);
+  else
+      mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor).arg(ActiveBgColor).arg(ActiveFgColor);
 
     setStyleSheet(mystyle);
 
@@ -198,13 +208,13 @@ void DtaskbarWidget::refreshTaskList()
 
     //              قائمة مؤقة بجميع معرفات النوافذ الحاضرة
    QList<unsigned long> listWindow = X11UTILLS::getClientList();
-    if(listWindow.count()==mButtonsHash.count())
-    {
+//    if(listWindow.count()==mButtonsHash.count())
+//    {
 
-        activeWindowChanged();
-        //   blockSignals(false);
-        return;
-    }
+//        activeWindowChanged();
+//        //   blockSignals(false);
+//        return;
+//    }
 
 
     //                  حذف جميع الازرار ومعرفاتها السابقة
@@ -241,9 +251,14 @@ void DtaskbarWidget::refreshTaskList()
         //            اضافة ازر للقائمة
         mButtonsHash.insert(wnd, btn);
 
-        //        اضافة الزر للبنال
-        m_horizontalLayout->addWidget(btn);
-       // btn->setIconSize(m_size);
+  qDebug()<<mButtonsHash.count() <<this->width();
+
+  //TODO fix This
+   //     if(mButtonsHash.count() *mBtnWidth <this->width()-20)
+
+         //        اضافة الزر للبنال
+            m_horizontalLayout->addWidget(btn);
+
 
     }
 
@@ -252,24 +267,23 @@ void DtaskbarWidget::refreshTaskList()
 
 
 
+
     foreach (DActionTaskbar *btn,mButtonsHash){
 
         if(m_iconStyle==TEXTBICON){
             btn->setMaximumWidth(mBtnWidth);
-           //  btn->setMaximumHeight(m_size.height());
-
-            btn->adjustSize();
 
         }else{
 
-            btn->setMaximumWidth(btn->sizeHint().width()+10);
-            btn->setMinimumWidth(btn->sizeHint().width()+10);
- btn->adjustSize();
+            btn->setMaximumWidth(btn->sizeHint().width()+7);
+            btn->setMinimumWidth(btn->sizeHint().width()+7);
+
         }
+         btn->adjustSize();
     }
 
     activeWindowChanged();
-adjustSize();
+//adjustSize();
     //blockSignals(false);
 
 }
@@ -334,108 +348,3 @@ void DtaskbarWidget::setSize(QSize size)
     refreshTaskList();
 }
 
-//======================== STYLE  ========================
-QString DtaskbarWidget::getStyle(int Style)
-{
-
-    switch (Style) {
-    case 1:
-        //  
-        return   (QLatin1String(
-                               "QToolButton{\n"
-                               "background-color: transparent;\n"
-                               "border-left:  10px solid transparent;\n"
-                               " border-radius: 0px;\n"
-                               "border-right:  10px solid transparent;\n"
-                               "}"
-                                "QToolButton:checked{\n"
-                                  "background-color: %2;\n"
-                                  "color: %3;\n"
-                                "border-left:  10px solid ;\n"
-                                " border-radius: 0px;\n"
-                                "border-right:  10px solid ;\n"
-                                "border-right-color: qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.429787 %1, stop:0.431 %2, stop:0.579 %2, stop:0.58 %1);\n"
-                                "\n"
-                                "	border-left-color: qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.429787 transparent, stop:0.431 %1, stop:0.579 %1, stop:0.58 transparent);\n"
-
-                                "}"));
-        break;
-    case 2:
-        // 
-        return   (QLatin1String(
-                      "QToolButton{\n"
-                      "background-color: transparent;\n"
-                      "border-left:  10px solid transparent;\n"
-                      " border-radius: 0px;\n"
-                      "border-right:  10px solid transparent;\n"
-                      "} \n"
-                      "QToolButton:checked{"
-                      " color: %3;\n"
-                      " border-right:10 solid; \n"
-                      " border-left:10 solid; \n"
-                       " background-color: %2; \n"
-                    "  border-left-color: qconicalgradient(cx:0, cy:0.533955, angle:180, stop:0.429787 %1, stop:0.431 %2, stop:0.579 %2, stop:0.58 %1); \n"
-                       " border-right-color: qconicalgradient(cx:0, cy:0.533955, angle:180, stop:0.429787 transparent, stop:0.431 %1, stop:0.579 %1, stop:0.58 transparent);"
-
-                      "}"));
-        break;
-    case 3:
-        return QString(
-                    "QToolButton{\n"
-                    "background-color: %1;\n"
-                    "border-left:  10px solid %1;\n"
-                    " border-radius: 0px;\n"
-                    "border-right:  10px solid %1;\n"
-                    "} \n"
-                    "QToolButton:checked{"
-                    " color: %3;\n"
-                     "background-color: %2;\n"
-                    " border-left-color: qconicalgradient(cx:1, cy:1, angle:315, stop:0.5 %2, stop:0.501 %1);"
-
-                    " border-right-color: qconicalgradient(cx:1, cy:1, angle:315, stop:0.5 %1, stop:0.501 %2);"
-                   "}"
-                    );
-        break;
-    case 4:
-        return QString(
-                    "QToolButton{\n"
-                    "background-color: %1;\n"
-                    "border-left:  10px solid %1;\n"
-                    " border-radius: 0px;\n"
-                    "border-right:  10px solid %1;\n"
-                    "} \n"
-                    "QToolButton:checked{"
-                    " color: %3;\n"
-                     "background-color: %2;\n"
-                  "  border-left-color: qconicalgradient(cx:0, cy:1, angle:225, stop:0.5 %2, stop:0.501 %1);"
-                   " border-right-color: qconicalgradient(cx:0, cy:1, angle:225, stop:0.5 %1, stop:0.501 %2); "
-                "}"
-
-                    );
-        break;
-    case 5:
-        return QString("QToolButton{ background-color: %1 ;  border:  0px solid; border-radius: 0px;} \n"
-                      " QToolButton:checked{"
-                       " color: %3 ;"
-                       " border:  0px solid; "
-                       " border-radius: 0px; "
-                       " background-color: %2 ;} "
-
-                       );
-
-
-        break;
-    default:
-        return QString("QToolButton{ background-color: palette(base) ; color: palette(windowText) ; border:  0px solid; border-radius: 0px;}"
-                      " QToolButton:checked{ background-color: palette(highlight) ;color: palette(highlightedtext); border:  0px solid ; border-radius: 0px;}"
-                       );
-
-        break;
-    }
-    return QString("QToolButton{ background-color: palette(base) ; color: palette(windowtext) ; border:  0px solid; border-radius: 0px;}"
-                  " QToolButton:checked{ background-color: palette(highlight) ;color: palette(highlightedtext); border:  0px solid ; border-radius: 0px;}"
-                   );
-
-
-
-}

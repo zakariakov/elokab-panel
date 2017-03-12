@@ -33,8 +33,8 @@ MenuApplications::MenuApplications(QWidget *parent) :
 
     setContentsMargins(0,0,0,0);
     setPopupMode(QToolButton::InstantPopup);
-    setCheckable(true);
-setChecked(true);
+   setCheckable(true);
+   setChecked(true);
     setupMenu();
     // keySequence();
 
@@ -92,41 +92,39 @@ void MenuApplications::loadSettings()
 
 
     QSettings setting;
-    //load setting
+    setting.beginGroup("Main");
+    QString mparentColor=setting.value("BgColor","#404244").toString();
+    QString mparentFColor=setting.value("FgColor","#FFFFFF").toString();
+    setting.endGroup();
+
     DesktopFile xdg(setting.fileName(),"Menu");
     int bstyle=(xdg.value("Style",0).toInt());
-    QString ButtonBgColor=xdg.value("ButtonBgColor","#1E90FF").toString();
-    QString ButtonFgColor=xdg.value("ButtonFgColor","#FFFFFF").toString();
+    QString ButtonBgColor=xdg.value("ButtonBgColor",mparentColor).toString();
+    QString ButtonFgColor=xdg.value("ButtonFgColor",mparentFColor).toString();
     QString MenuBgColor=xdg.value("MenuBgColor","#404244").toString();
     QString MenuFgColor=xdg.value("MenuFgColor","#FFFFFF").toString();
-    setText(xdg.value("Text",trUtf8("Start")).toString());
+    QString MenuBorderColor=xdg.value("MenuBorderColor","#666666").toString();
+    setText(xdg.value("Text",tr("Start")).toString());
     int radius=xdg.value("BoderRadius",0).toInt();
 
 
 
     mnuFile->setContentsMargins(radius,radius,radius,radius);
-    QString sty=MyStyle::taskbarStyle(bstyle).arg("transparent").arg(ButtonBgColor).arg(ButtonFgColor);
-    QString st=QString(
+    QString stButton=MyStyle::taskbarStyle(bstyle).arg(mparentColor).arg(ButtonBgColor).arg(ButtonFgColor);
+    QString stMenu=MyStyle:: menuColor()
+            .arg(MenuBgColor)
+            .arg(MenuFgColor)
+            .arg(MenuBorderColor)
+            .arg(QString::number(radius));
 
-                "QMenu {"
-                " border-radius: 5px;\n"
-                " background-color: %1; "
-                " border: 1px solid black;"
-                "color: #ffffff;\n"
-                " }"
 
-                " QMenu::item:selected {"
-                " background-color: %2;"
-                "color: %1;\n"
-                " }"
-                ).arg(MenuBgColor).arg(MenuFgColor);
-    setStyleSheet(sty+st);
-    mnuFile-> setPalette(Qt::transparent);
-    mnuFile->setAttribute(Qt::WA_TranslucentBackground,true);
+    setStyleSheet(stButton+stMenu);
+//    mnuFile-> setPalette(Qt::transparent);
+//    mnuFile->setAttribute(Qt::WA_TranslucentBackground,true);
     foreach (QMenu *m,menuProgrammes->menus) {
-        m->setStyleSheet(st);
+        m->setStyleSheet(stMenu);
     }
-
+menuPower->setStyleSheet(stMenu);
 }
 
 void MenuApplications::execApplication()
@@ -188,11 +186,10 @@ void MenuApplications::afterMenuActivated()
         mpos=mapToGlobal(QPoint(this->rect().right()-mnuFile->sizeHint().width(),posy));
     }
 
+     mnuFile->hide();
+    mnuFile->exec(mpos);
     mnuFile->activateWindow();
     mnuFile->setFocus();
-    //    mnuFile->hide();
-    mnuFile->exec(mpos);
-
 
 }
 void MenuApplications::showHideMenu()
@@ -206,6 +203,8 @@ void MenuApplications::showMenu()
 {
 
     mnuFile->activateWindow();
+    mnuFile->setFocus();
+
     QTimer::singleShot(10, this, SLOT(afterMenuActivated()));
 }
 

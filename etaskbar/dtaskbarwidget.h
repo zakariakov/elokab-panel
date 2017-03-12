@@ -40,7 +40,7 @@ void loadSettings();
 
 private slots:
 
-
+void init();
           void setIconStyle();
 
 
@@ -48,7 +48,7 @@ private slots:
           void activeWindowChanged();
 
           void wheelEvent(QWheelEvent* event);
-QString getStyle(int Style);
+
 
 private:
          // QMap<unsigned long, Client*> m_clients;

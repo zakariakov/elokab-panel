@@ -12,20 +12,28 @@ public:
     //___________________________________________
     // §1 =first color %2= next color %3=forcolor
     //___________________________________________
-
-    static  QString left_left_powerline(){
-        return  QString("qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.429787"
+/*
+  "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.429787"
                         " %1, stop:0.431 "
                         " %2, stop:0.579 "
                         " %2, stop:0.58 "
                         " %1); \n");
+                        */
+    static  QString left_left_powerline(){
+        return  QString(
+                        "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.43"
+                        " %1, stop:0.431"
+                        " %2, stop:0.579 "
+                        " %2, stop:0.58 "
+                        " %1);");
     }
     static QString right_left_powerlinr(){
-        return QString ("qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.429787"
-                        " %1, stop:0.410 "
-                        " %2, stop:0.559 "
-                        " %2, stop:0.58 "
-                        " %1); \n");
+        return  QString(
+                        "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.43"
+                        " %2, stop:0.431"
+                        " %1, stop:0.579 "
+                        " %1, stop:0.58 "
+                        " %2);");
     }
 
     static QString  right_Reverse_powerline()
@@ -79,9 +87,10 @@ public:
     {
 
         return QString(  "QToolButton{\n"
+
                          "background-color: %1;\n"
-                         "border-left:  7px solid %1;\n"
                          "border-radius: 0px;\n"
+                         "border-left:  7px solid %1;\n"
                          "border-right:  7px solid %1;\n"
                          "}\n"
                          );
@@ -138,10 +147,9 @@ public:
 
             return   (QString(
                           toolbuton_normal_color()+
-
                            toolbuton_checked_color()+
-                          "border-right-color: "+right_left_powerlinr()+
-                          "border-left-color:"+left_left_powerline()+
+                          "border-right-color:"+left_left_powerline()+
+                          "border-left-color:"+right_left_powerlinr()+
                           "}")
                       );
             break;
@@ -159,8 +167,8 @@ public:
             return QString(
                         toolbuton_normal_color()+
                         toolbuton_checked_color()+
-                        " border-left-color: "+right_curvature()+
-                        " border-right-color: "+right_curvature_Reverse()+
+                        " border-left-color: "+right_curvature_Reverse()+
+                        " border-right-color: "+right_curvature()+
                         "}"
                         );
             break;
@@ -169,8 +177,8 @@ public:
             return QString(
                         toolbuton_normal_color()+
                         toolbuton_checked_color()+
-                        "  border-left-color: "+left_curvature()+
-                        " border-right-color: "+left_curvature_Reverse()+
+                        "  border-left-color: "+left_curvature_Reverse()+
+                        " border-right-color: "+left_curvature()+
                         "}"
 
                         );
@@ -188,14 +196,34 @@ public:
 
             break;
         }
-        return QString("QToolButton{ background-color:%1; "
-                       " border:  0px solid #ffffff; "
-                       " border-radius: 0px; }"
-                       " QToolButton:checked{ background-color: palette(highlight) ;color: palette(highlightedtext); border:  0px solid ; border-radius: 0px;}"
+        return QString("QToolButton{ background-color:%1; \n "
+                       " border:  0px solid #ffffff;  \n"
+                       " border-radius: 0px; } \n"
+                       " QToolButton:checked{ background-color: palette(highlight) ; \n"
+                       " color: palette(highlightedtext); \n"
+                       "border:  0px solid #ffffff;  \n"
+                       "border-radius: 0px;} \n"
                        );
 
 
 
+    }
+   static  QString menuColor()
+    {
+      return  QString(
+
+                        "QMenu {"
+                        " border-radius: %4px;\n"
+                        " background-color: %1; "
+                        " border: 1px solid %3;"
+                        " color: %2;\n"
+                        " }"
+
+                        " QMenu::item:selected {"
+                        " background-color: %2;"
+                        " color: %1;\n"
+                        " }"
+                        ) ;
     }
 
 };
