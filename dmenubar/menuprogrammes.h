@@ -50,6 +50,7 @@ public:
 
 signals:
        void menuRecharged();
+       void actionExecuted(QAction *act);
 private:
       MenuGen *m_menuGen;
 

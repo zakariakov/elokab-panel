@@ -30,3 +30,8 @@ void panel_adaptor::reconfigure()
  {
       QMetaObject::invokeMethod(parent(), "showMenu");
  }
+
+ void panel_adaptor::exit()
+ {
+      QMetaObject::invokeMethod(parent(), "exit");
+ }

@@ -51,7 +51,8 @@ SOURCES += main.cpp\
         dmenubar/menusystem.cpp \
     dmenubar/power/powerdlg.cpp \
     dmenubar/power/powermain.cpp \
-    panel_adaptor.cpp
+    panel_adaptor.cpp \
+    dmenubar/menurecent.cpp
 
 
 
@@ -75,7 +76,8 @@ HEADERS  += panelwidget.h \
             dmenubar/menusystem.h \
     dmenubar/power/powerdlg.h \
     dmenubar/power/powermain.h \
-    panel_adaptor.h
+    panel_adaptor.h \
+    dmenubar/menurecent.h
 
 
 
@@ -84,4 +86,29 @@ HEADERS  += panelwidget.h \
 FORMS    += panelwidget.ui
 
 DISTFILES += \
-    car.xml
+    car.xml \
+    etc/xdg/menus/elokab-applications.menu \
+    usr/share/desktop-directories/elokab-audio-video.directory \
+    usr/share/desktop-directories/elokab-development.directory \
+    usr/share/desktop-directories/elokab-education.directory \
+    usr/share/desktop-directories/elokab-game.directory \
+    usr/share/desktop-directories/elokab-graphics.directory \
+    usr/share/desktop-directories/elokab-home.directory \
+    usr/share/desktop-directories/elokab-islamic.directory \
+    usr/share/desktop-directories/elokab-menu-applications.directory \
+    usr/share/desktop-directories/elokab-network.directory \
+    usr/share/desktop-directories/elokab-office.directory \
+    usr/share/desktop-directories/elokab-other.directory \
+    usr/share/desktop-directories/elokab-recent.directory \
+    usr/share/desktop-directories/elokab-settings.directory \
+    usr/share/desktop-directories/elokab-system-tools.directory \
+    usr/share/desktop-directories/elokab-system.directory \
+    usr/share/desktop-directories/elokab-utility.directory \
+    usr/share/elokab/elokab-syspower/Hibernate.desktop \
+    usr/share/elokab/elokab-syspower/Lock.desktop \
+    usr/share/elokab/elokab-syspower/Logout.desktop \
+    usr/share/elokab/elokab-syspower/Message.desktop \
+    usr/share/elokab/elokab-syspower/Reboot.desktop \
+    usr/share/elokab/elokab-syspower/Shutdown.desktop \
+    usr/share/elokab/elokab-syspower/Suspend.desktop \
+    usr/share/elokab/elokab-menu/elokab-recent.desktop

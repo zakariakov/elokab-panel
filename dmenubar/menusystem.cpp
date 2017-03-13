@@ -86,7 +86,7 @@ MenuSystem::MenuSystem()
     this->addAction(m_actLokScreen);
     this->addAction(m_actLogout);
     //**************
-
+refreshIcons();
 }
 QString MenuSystem::loadService(const QString &path)
 {

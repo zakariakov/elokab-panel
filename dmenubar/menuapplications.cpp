@@ -1,6 +1,8 @@
 #include "menuapplications.h"
 #include "utils/mystyle.h"
 #include "utils/desktopfile.h"
+#include "utils/x11utills.h"
+
 //#include "menuconfigdialog.h"
 //#include <EMimIcon>
 
@@ -47,13 +49,13 @@ void MenuApplications::setupMenu()
 
     menuProgrammes=new MenuProgrammes(this);
     connect(menuProgrammes,SIGNAL(menuRecharged()),this,SLOT(rechargeMenu()));
-
-   menuPower=new MenuSystem;
+    mMenuRecent=new MenuRecent(this);
+     connect(menuProgrammes,SIGNAL(actionExecuted(QAction*)),mMenuRecent,SIGNAL(actionAdded(QAction*)));
+   menuPower=new MenuSystem();
 
     mnuFile=new QMenu(this);
 
     menuFolders=new MenuFolders(this);
-
 
     setMenu(mnuFile);
     rechargeMenu();
@@ -68,6 +70,7 @@ void MenuApplications::rechargeMenu()
 
     mnuFile->addActions(m_actList);
     mnuFile->addSeparator();
+    mnuFile->addMenu(mMenuRecent);
     foreach (QMenu *m, menuProgrammes->menus) {
         mnuFile->addMenu(m);
 
@@ -186,10 +189,11 @@ void MenuApplications::afterMenuActivated()
         mpos=mapToGlobal(QPoint(this->rect().right()-mnuFile->sizeHint().width(),posy));
     }
 
-     mnuFile->hide();
     mnuFile->exec(mpos);
     mnuFile->activateWindow();
-    mnuFile->setFocus();
+
+     X11UTILLS::raiseWindow(mnuFile->winId());
+      mnuFile->setFocus();
 
 }
 void MenuApplications::showHideMenu()

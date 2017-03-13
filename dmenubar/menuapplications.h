@@ -1,10 +1,11 @@
 #ifndef MENUAPPLICATIONS_H
 #define MENUAPPLICATIONS_H
 
-//#include <MenuSystem>
+
 #include "menuprogrammes.h"
 #include "menufolders.h"
 #include "menusystem.h"
+#include "menurecent.h"
 #include <QWidget>
 #include <QMenu>
 #include <QMenuBar>
@@ -61,8 +62,8 @@ private slots:
 private:
     MenuProgrammes *menuProgrammes;
     MenuFolders *menuFolders;
-    MenuSystem *menuPower;
-
+   MenuRecent *mMenuRecent;
+   MenuSystem *menuPower;
     QList<QAction *>m_actList;
 
 

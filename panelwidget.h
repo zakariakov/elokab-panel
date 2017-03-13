@@ -17,8 +17,6 @@ namespace Ui {
 class PanelWidget;
 }
 
-
-
 //#include "X11/Xlib.h"
 //#include <X11/Xatom.h>
 #include "etaskbar/dtaskbarwidget.h"
@@ -32,8 +30,9 @@ public:
     ~PanelWidget();
 public slots:
 void reconfigure();
+void exit(){qApp->quit();}
 void showMenu();
-      void setShortcut(QString){ reconfigure();}
+
 private:
     Ui::PanelWidget *ui;
 StatusWidget *mStatusWidget;

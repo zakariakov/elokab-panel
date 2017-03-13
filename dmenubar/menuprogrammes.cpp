@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *   elokab Copyright (C) 2014 AbouZakaria <yahiaui@gmail.com>             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -109,7 +109,7 @@ void MenuProgrammes::chargeMenu()
 
     QFile file(xmlPath);
 
-  qDebug()<<file.fileName()<<"============================================================";
+  qDebug()<<file.fileName()<<"===================";
 
     if (!file.open(QIODevice::ReadOnly)){
         qDebug()<<file.errorString();
@@ -167,7 +167,7 @@ void MenuProgrammes::addMenuDirectory( QString directory,QString category)
 
     QMenu *menu=new QMenu;
     menu->setTitle(text);
-    menu->setToolTip(comment);
+   // menu->setToolTip(comment);
     //حفظ اسم الايقونة لاستخدامه عند التحديث
     menu->setObjectName(icon);
 
@@ -373,7 +373,7 @@ void MenuProgrammes::lanchApplication()
         qDebug()<<"MenuProgrammes::lanchApplication()===================="<<exec;
   //  EMimIcon::launchApplication(appPath);
       process.startDetached(exec);
-
+     emit actionExecuted(action);
     }
 }
 
