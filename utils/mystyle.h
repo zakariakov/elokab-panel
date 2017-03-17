@@ -1,4 +1,4 @@
-#ifndef MYSTYLE_H
+﻿#ifndef MYSTYLE_H
 #define MYSTYLE_H
 
 
@@ -9,33 +9,31 @@ class MyStyle
 
 public:
     explicit   MyStyle(){}
-    //___________________________________________
-    // §1 =first color %2= next color %3=forcolor
-    //___________________________________________
-/*
-  "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.429787"
-                        " %1, stop:0.431 "
-                        " %2, stop:0.579 "
-                        " %2, stop:0.58 "
-                        " %1); \n");
-                        */
+    /*------------------------------------------------/
+     * arg %1 =first color %2= next color %3=forcolor /
+    /------------------------------------------------*/
+
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static  QString left_left_powerline(){
         return  QString(
-                        "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.43"
-                        " %1, stop:0.431"
-                        " %2, stop:0.579 "
-                        " %2, stop:0.58 "
-                        " %1);");
-    }
-    static QString right_left_powerlinr(){
-        return  QString(
-                        "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.43"
-                        " %2, stop:0.431"
-                        " %1, stop:0.579 "
-                        " %1, stop:0.58 "
-                        " %2);");
+                    "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.43"
+                    " %1, stop:0.431"
+                    " %2, stop:0.579 "
+                    " %2, stop:0.58 "
+                    " %1);");
     }
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
+    static QString right_left_powerlinr(){
+        return  QString(
+                    "qconicalgradient(cx:1, cy:0.506, angle:358.2, stop:0.43"
+                    " %2, stop:0.431"
+                    " %1, stop:0.579 "
+                    " %1, stop:0.58 "
+                    " %2);");
+    }
+
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  right_Reverse_powerline()
     {
         return QString(" qconicalgradient(cx:0, cy:0.533955, angle:180, stop:0.429787 "
@@ -45,7 +43,7 @@ public:
                        " %2); \n");
     }
 
-
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  left_Reverse_powerline()
     {
         return QString(" qconicalgradient(cx:0, cy:0.533955, angle:180, stop:0.429787 "
@@ -55,6 +53,7 @@ public:
                        " %1);");
     }
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  right_curvature()
     {
         return QString("qconicalgradient(cx:1, cy:1, angle:315, stop:0.5 "
@@ -62,6 +61,7 @@ public:
                        " %2); \n" );
     }
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  left_curvature()
     {
         return QString(" qconicalgradient(cx:0, cy:1, angle:225, stop:0.5 "
@@ -69,6 +69,7 @@ public:
                        " %2); \n" );
     }
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  right_curvature_Reverse()
     {
         return QString("qconicalgradient(cx:1, cy:1, angle:315, stop:0.5 "
@@ -76,6 +77,7 @@ public:
                        " %1); \n" );
     }
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  left_curvature_Reverse()
     {
         return QString(" qconicalgradient(cx:0, cy:1, angle:225, stop:0.5 "
@@ -83,19 +85,21 @@ public:
                        " %1); \n" );
     }
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  toolbuton_normal_color()
     {
 
         return QString(  "QToolButton{\n"
 
-                         "background-color: %1;\n"
+                         "background-color: transparent;\n"
                          "border-radius: 0px;\n"
-                         "border-left:  7px solid %1;\n"
-                         "border-right:  7px solid %1;\n"
+                         "border-left:  7px solid transparent;\n"
+                         "border-right:  7px solid transparent;\n"
                          "}\n"
                          );
     }
 
+    //  ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString  toolbuton_checked_color()
     {
 
@@ -106,6 +110,7 @@ public:
     }
 
 
+    //    ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString statusStyle(int style)
     {
         switch (style) {
@@ -138,7 +143,7 @@ public:
         return QString();
     }
 
-    //TaskBar
+    //TaskBar  ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
     static QString taskbarStyle(int Style)
     {
 
@@ -147,7 +152,7 @@ public:
 
             return   (QString(
                           toolbuton_normal_color()+
-                           toolbuton_checked_color()+
+                          toolbuton_checked_color()+
                           "border-right-color:"+left_left_powerline()+
                           "border-left-color:"+right_left_powerlinr()+
                           "}")
@@ -208,22 +213,24 @@ public:
 
 
     }
-   static  QString menuColor()
+
+    //MENU  ـــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
+    static  QString menuColor()
     {
-      return  QString(
+        return  QString(
 
-                        "QMenu {"
-                        " border-radius: %4px;\n"
-                        " background-color: %1; "
-                        " border: 1px solid %3;"
-                        " color: %2;\n"
-                        " }"
+                    "QMenu {"
+                    " border-radius: %4px;\n"
+                    " background-color: %1; "
+                    " border: 1px solid %3;"
+                    " color: %2;\n"
+                    " }"
 
-                        " QMenu::item:selected {"
-                        " background-color: %2;"
-                        " color: %1;\n"
-                        " }"
-                        ) ;
+                    " QMenu::item:selected {"
+                    " background-color: %2;"
+                    " color: %1;\n"
+                    " }"
+                    ) ;
     }
 
 };

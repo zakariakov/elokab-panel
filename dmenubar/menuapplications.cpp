@@ -14,9 +14,9 @@
 #include  <QDesktopWidget>
 #include  <QUrl>
 #include  <QApplication>
-//#include <X11/Xlib.h>
-
-
+#include  <QDebug>
+#include  <QCompleter>
+//------------------------------------------------------------------
 MenuApplications::MenuApplications(QWidget *parent) :
     QToolButton(parent)
 
@@ -24,7 +24,7 @@ MenuApplications::MenuApplications(QWidget *parent) :
     QFont font=parent->font();
    font.setPointSize(parent->font().pointSize());
    setFont(font);
-
+   setContentsMargins(0,0,0,0);
     this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
     //this->setTitle(tQTextStreamrUtf8("Applications"));
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus ,false);
@@ -33,7 +33,7 @@ MenuApplications::MenuApplications(QWidget *parent) :
     this->setWhatsThis(tr("classic menu lancher by AbouZakaria"));//شرح الاضافة
     this->setWindowIcon(QIcon::fromTheme("start-here",QIcon::fromTheme("start-here")));//ايقونة الاضافة
 
-    setContentsMargins(0,0,0,0);
+
     setPopupMode(QToolButton::InstantPopup);
    setCheckable(true);
    setChecked(true);
@@ -42,11 +42,13 @@ MenuApplications::MenuApplications(QWidget *parent) :
 
 }
 
-
-
+//------------------------------------------------------------------
 void MenuApplications::setupMenu()
 {
 
+
+mFindButton=new FindButton;
+ connect(mFindButton,SIGNAL(findTextChanged(QString)),this,SLOT(findText(QString)));
     menuProgrammes=new MenuProgrammes(this);
     connect(menuProgrammes,SIGNAL(menuRecharged()),this,SLOT(rechargeMenu()));
     mMenuRecent=new MenuRecent(this);
@@ -56,19 +58,34 @@ void MenuApplications::setupMenu()
     mnuFile=new QMenu(this);
 
     menuFolders=new MenuFolders(this);
+    mnuFind=new QMenu(this);
+    mnuFind->setTitle(tr("Find"));
+    mnuFind->setIcon(QIcon::fromTheme("edit-find"));
+    connect(mnuFind,SIGNAL(aboutToShow()),mFindButton,SLOT(setFocus()));
 
-    setMenu(mnuFile);
+
+         setMenu(mnuFile);
+
     rechargeMenu();
     loadSettings();
 
 }
+
+//------------------------------------------------------------------
 void MenuApplications::rechargeMenu()
 {
-    //this->clear();
 
-    mnuFile->clear();
+ //clear();
+     mnuFile->clear();
 
-    mnuFile->addActions(m_actList);
+     mnuFind->clear();
+
+     mnuFind->addAction(mFindButton->actionfind());
+
+     mnuFind->addSeparator();
+ //add menus
+     mnuFile->addMenu(mnuFind);
+
     mnuFile->addSeparator();
     mnuFile->addMenu(mMenuRecent);
     foreach (QMenu *m, menuProgrammes->menus) {
@@ -82,14 +99,12 @@ void MenuApplications::rechargeMenu()
 
     mnuFile->addMenu(menuPower);
 
-  //  setMenu(mnuFile);
 
 
-//    adjustSize();
 }
 
 
-
+//------------------------------------------------------------------
 void MenuApplications::loadSettings()
 {
 
@@ -127,9 +142,11 @@ void MenuApplications::loadSettings()
     foreach (QMenu *m,menuProgrammes->menus) {
         m->setStyleSheet(stMenu);
     }
+
 menuPower->setStyleSheet(stMenu);
 }
 
+//------------------------------------------------------------------
 void MenuApplications::execApplication()
 {
     QAction *action = qobject_cast<QAction *>(sender());
@@ -144,30 +161,9 @@ void MenuApplications::execApplication()
     }
 }
 
-void MenuApplications::refreshIcons()
-{
 
-    menuProgrammes->refreshIcons();
-   // toolStartHere->setIcon(QIcon::fromTheme("start-here"));
-   // mnuFile->setIcon(QIcon::fromTheme("start-here").pixmap(QSize(128, 128)));
-    menuFolders->refreshIcons();
 
-    menuPower->refreshIcons();
-
-}
-
-//void  MenuApplications::setKeySequence(QKeySequence sequence)
-//{
-//    //  qDebug()<<"plugins-----key---:b "<<sequence.toString();
-//    QKeySequence ks(m_ks);
-//    if(ks==sequence){
-//        mnuFile->show();
-//       activateWindow();
-
-//        QTimer::singleShot(10, this, SLOT(afterMenuActivated()));
-//    }
-//}
-
+//------------------------------------------------------------------
 void MenuApplications::afterMenuActivated()
 {
 
@@ -182,20 +178,18 @@ void MenuApplications::afterMenuActivated()
 
     QPoint mpos;
 
-    if (isLeftToRight())
-    {
-        mpos=mapToGlobal(QPoint(toolStartHere->rect().left(),posy));
-    }else{
         mpos=mapToGlobal(QPoint(this->rect().right()-mnuFile->sizeHint().width(),posy));
-    }
+
 
     mnuFile->exec(mpos);
     mnuFile->activateWindow();
 
      X11UTILLS::raiseWindow(mnuFile->winId());
-      mnuFile->setFocus();
+     mnuFile->setFocus();
 
 }
+
+//------------------------------------------------------------------
 void MenuApplications::showHideMenu()
 {
     if (mnuFile && mnuFile->isVisible())
@@ -203,6 +197,8 @@ void MenuApplications::showHideMenu()
     else
         showMenu();
 }
+
+//------------------------------------------------------------------
 void MenuApplications::showMenu()
 {
 
@@ -212,43 +208,34 @@ void MenuApplications::showMenu()
     QTimer::singleShot(10, this, SLOT(afterMenuActivated()));
 }
 
-//QString   MenuApplications:: keySequence()
-//{
-
-//    QSettings settings("elokab","shortcut");
-//    settings.beginGroup("Panel-Plugins");
-//    settings.beginGroup("MenuBar");
-//    if(!settings.contains("Destination")){
-//        settings.setValue("Key",QKeySequence("Alt+F1").toString());
-//        settings.setValue("Destination","panel");
-//         settings.setValue("Comment","show the Main Menu panal");
-
-//    }
-
-
-//    m_ks= settings.value("Key","Alt+F1").toString();
-//    settings.endGroup();//MenuBar
-//    settings.endGroup();//Panel-Plugins
-//    return m_ks;
-//}
-//void  MenuApplications::setActions(QList<QAction *>list)
-//{
-//    m_actList=list;
-//    rechargeMenu();
-//}
-
-void MenuApplications::setSize(QSize size)
+//------------------------------------------------------------------Find
+void MenuApplications::findText(QString text)
 {
-   // toolStartHere->setIconSize(size);
-    //  toolStartHere->setMaximumHeight(size.height()+4);
-  //  rechargeMenu();
+
+    foreach (QAction *a, mnuFind->actions()) {
+
+        if(a->objectName()=="ActionWidget")
+            continue;
+
+        mnuFind->removeAction(a);
+    }
+
+    if (text.isEmpty()) return;
+
+    foreach (QMenu *m, menuProgrammes->menus) {
+        foreach (QAction *a,   m->actions()) {
+            QStringList data=a->data().toStringList();
+            QString exec=data.at(0);
+            if(exec.toLower().contains(text)
+                    ||a->text().toLower().contains(text))
+            {
+                mnuFind->addAction(a);
+            }
+        }
+    }
+
 }
 
-
-//void MenuApplications::setLayout(QHBoxLayout *p)
-//{
-//    p->addWidget(this);
-//}
 
 
 

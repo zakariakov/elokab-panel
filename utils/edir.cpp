@@ -281,15 +281,15 @@ QString Edir::xdgDirName(const QString &name)
 
         QString key=line.section("=",0,0).trimmed();
         QString value=line.section("=",1,1).trimmed();
-if(key!=name)
-    continue;
+        if(key!=name)
+            continue;
 
         if (key.isEmpty())
             continue;
-value.remove("$HOME/");
-value.remove("\"");
-      return value;
-            //insert(key,value);
+        value.remove("$HOME/");
+        value.remove("\"");
+        return value;
+        //insert(key,value);
 
 
 
@@ -299,6 +299,6 @@ value.remove("\"");
 
     files.close();
 
-
+    return QString();
 
 }

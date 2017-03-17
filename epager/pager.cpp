@@ -33,7 +33,7 @@ Pager::Pager( QWidget* parent)
       m_pSignalMapper(new QSignalMapper(this)),
       m_DeskCount(1)
 {
-    this->setObjectName("DesktopSwitch");
+    this->setObjectName("Pager");
     this->setWindowTitle(tr("Desktop Switch"));
 
     QFont font=parent->font();
@@ -47,7 +47,7 @@ Pager::Pager( QWidget* parent)
 
     setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
     mHBoxLayout = new QHBoxLayout(this);
-    mHBoxLayout->setSpacing(1);
+    mHBoxLayout->setSpacing(0);
     mHBoxLayout->setContentsMargins(0, 0, 0, 0);
     mHBoxLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
     setContentsMargins(0, 0, 0, 0);
@@ -72,17 +72,21 @@ void Pager::loadSettings()
 
     QString  ActiveBgColor=setting.value("ActiveBgColor","#1E90FF").toString();
     QString  ActiveFgColor=setting.value("ActiveFgColor","#FFFFFF").toString();
-    int      Style=setting.value("Style",3).toInt();
+    int      Style=setting.value("Style",0).toInt();
+//    QString  inActiveBgColor=setting.value("InActiveBgColor","#ADD8E6"/*mparentColor*/).toString();
+//    QString  inActiveFgColor=setting.value("InActiveFgColor","#FFFFFF").toString();
     setting.endGroup();
 
-    QString mystyle;
-    if(Style<1||Style>5)
-        mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor);
-    else
-        mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor).arg(ActiveBgColor).arg(ActiveFgColor);
+    QString styleButton ,styleWidget;
+    if(Style<1||Style>5){
+        styleButton=  MyStyle::taskbarStyle(Style).arg(mparentColor);
+    }else{
+        styleButton=  MyStyle::taskbarStyle(Style).arg(mparentColor).arg(ActiveBgColor).arg(ActiveFgColor);
+        //styleWidget=MyStyle::widgetStyle(Style).arg(inActiveBgColor);
+}
+    qDebug()<<styleWidget;
+  setStyleSheet(styleButton);
 
-
-   setStyleSheet(mystyle);
 }
 
 

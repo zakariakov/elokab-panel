@@ -98,7 +98,8 @@ DesktopFile::DesktopFile(const QString &fileName,const QString &group ,const QSt
               if (section.trimmed() == "Main"||
                   section.trimmed() == "SysTry"||
                   section.trimmed() == "Taskbar"||
-                  section.trimmed() == "Status"
+                  section.trimmed() == "Status" ||
+                   section.trimmed() == "Pager"
                       )continue;
 
               if(!section.trimmed().startsWith("Statu-"))

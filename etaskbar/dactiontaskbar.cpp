@@ -31,16 +31,16 @@ DActionTaskbar::DActionTaskbar(const Window window, QWidget *parent) :
           m_Window(window)
 {
           this->setCheckable(true);
-    this->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+    this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     QFont font=parent->font();
    font.setPointSize(parent->font().pointSize());
 
    setFont(font);
-       setContentsMargins(0,0,0,0);
+  setContentsMargins(0,0,0,0);
    QFontMetrics fm(parent->font());
    int size=fm.height();
  //   qDebug()<<"DActionTaskbar::DActionTaskbar()================================iconSize()"<<size;
-   setIconSize(QSize(size,size));
+  setIconSize(QSize(size,size));
 
           getText();
           getIcon();
@@ -155,7 +155,7 @@ void DActionTaskbar::contextMenuEvent(QContextMenuEvent* event)
 
 
 
-          QMenu menu(QObject::trUtf8("Application"));
+          QMenu menu(tr("Application"));
           QAction* a;
 
 

@@ -44,6 +44,11 @@ SysTray::SysTray( QWidget *parent):
     mIconSize(TRAY_ICON_SIZE_DEFAULT, TRAY_ICON_SIZE_DEFAULT),
     mDisplay(QX11Info::display())
 {
+    QFont font=parent->font();
+   font.setPointSize(parent->font().pointSize());
+   setFont(font);
+   setContentsMargins(0,0,0,0);
+
     mLayout = new QHBoxLayout(this);
     mLayout->setContentsMargins(0,0,0,0);
     mLayout->setSpacing(3);

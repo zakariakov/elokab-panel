@@ -15,32 +15,37 @@ PanelWidget::PanelWidget(QWidget *parent) :
     if(sS=="i3")
         setWindowFlags( Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     else
-        setWindowFlags(Qt::BypassWindowManagerHint | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        setWindowFlags(/*Qt::BypassWindowManagerHint |*/ Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
     setAttribute(Qt::WA_X11NetWmWindowTypeDock);
     setAttribute(Qt::WA_AlwaysShowToolTips);
+  setAttribute(Qt::WA_X11DoNotAcceptFocus);
     setWindowTitle(tr("Panel"));
     setObjectName("PanelWidget");
-    //setPalette(Qt::transparent);
-    //setAttribute(Qt::WA_TranslucentBackground,true);
-    setMaximumHeight(40);
+    setPalette(Qt::transparent);
+    setAttribute(Qt::WA_TranslucentBackground,true);
+
     ui->setupUi(this);
     loadIconThems();
-    mMenuApplications =new MenuApplications(this);
-    mStatusWidget=new StatusWidget(this);
-
-    mDtaskbarWidget=new DtaskbarWidget(this);
-    mSysTray=new SysTray;
-    ui->horizontalLayout->setSpacing(0);
-    ui->horizontalLayout->addWidget(mMenuApplications);
-    ui->horizontalLayout->addWidget(mDtaskbarWidget);
-    ui->horizontalLayout->addWidget(mStatusWidget);
-    ui->horizontalLayout->addWidget(mSysTray);
-
     QFontMetrics fm(font());
     int size=fm.height();
 
     setGeometry(0,0,50,size+5);
+    setMaximumHeight(size);
+    mMenuApplications =new MenuApplications(this);
+  mStatusWidget=new StatusWidget(this);
+    mDtaskbarWidget=new DtaskbarWidget(this);
+    mSysTray=new SysTray(this);
+    mPager=new Pager(this);
+
+    ui->horizontalLayout->setSpacing(0);
+    ui->horizontalLayout->addWidget(mMenuApplications);
+   ui->horizontalLayout->addWidget(mPager);
+    ui->horizontalLayout->addWidget(mDtaskbarWidget);
+    ui->horizontalLayout->addWidget(mStatusWidget);
+   ui->horizontalLayout->addWidget(mSysTray);
+
+
 
     moveToAllDesktop();
     loadSettings();
@@ -48,6 +53,7 @@ PanelWidget::PanelWidget(QWidget *parent) :
     //adjustSize();
 
 //connect( mInterface,SIGNAL(themChanged()),this,SLOT(reconfigureThemes()));
+
 
 }
 
@@ -64,7 +70,7 @@ void PanelWidget::reconfigure()
     qDebug()<<"called reconfigura";
     loadSettings();
    mMenuApplications->loadSettings();
-   mDtaskbarWidget->loadSettings();
+  mDtaskbarWidget->loadSettings();
    mStatusWidget->loadSettings();
    // resizePanel();
 }
@@ -82,12 +88,31 @@ void PanelWidget::loadSettings()
     //    BoderColor=#FF5500
     QSettings setting;
     setting.beginGroup("Main");
-    QString BgColor=setting.value("BgColor","#404244").toString();
-    QString FgColor=setting.value("FgColor","#FFFFFF"
-                                            "").toString();
+    QString bgColor=setting.value("BgColor","#404244").toString();
+    QString FgColor=setting.value("FgColor","#FFFFFF" ).toString();
+
     m_Position=setting.value("Position",1).toInt();
-    this->setStyleSheet(QString("background-color: %1;color: %2;").arg(BgColor).arg(FgColor));
+
+    //TODO FIX ALPHA IN mystyle.h and all moduls
+   /*
+    int Alpha=setting.value("Alpha",255).toInt();
+    QColor bg=QColor(bgString);
+    bg.setAlpha(Alpha);
+
+    QString bgColor=QString("rgba(%1,%2,%3,%4)")
+            .arg(bg.red())
+            .arg(bg.green())
+            .arg(bg.blue())
+            .arg(bg.alpha());
+    */
+
+
+    this->setStyleSheet(QString("background-color: %1;color: %2;") .arg(bgColor) .arg(FgColor));
+
+
+
     resizePanel();
+
 }
 
 void PanelWidget::resizePanel()
@@ -201,14 +226,17 @@ void PanelWidget::moveToAllDesktop()
     XClientMessageEvent msg;
     msg.window = this->winId();
     msg.type = ClientMessage;
-    msg.message_type = XFatom("_NET_WM_WINDOW_TYPE_DOCK" /*"_NET_WM_DESKTOP"*/);
+    msg.message_type = XFatom(/*"_NET_WM_WINDOW_TYPE_DOCK" */"_NET_WM_DESKTOP");
     msg.send_event = true;
     msg.display = QX11Info::display();
     msg.format = 32;
     msg.data.l[0] = -1;
     //TODO FIX This
     XSendEvent(QX11Info::display(), QX11Info::appRootWindow(0), 0, (SubstructureRedirectMask | SubstructureNotifyMask) , (XEvent *) &msg);
-
+    XChangeSaveSet(
+        QX11Info::display(),
+        this->winId(),
+        XFatom(/*"_NET_WM_WINDOW_TYPE_DOCK" */"_NET_WM_DESKTOP")	);
 }
 
 //! -x11-اشارات مكتبة  -------------------------------------------------- */

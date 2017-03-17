@@ -2,6 +2,7 @@
 #define MENUAPPLICATIONS_H
 
 
+#include "findbutton.h"
 #include "menuprogrammes.h"
 #include "menufolders.h"
 #include "menusystem.h"
@@ -12,67 +13,62 @@
 #include <QToolButton>
 #include <QFileSystemWatcher>
 #include <QLayout>
+#include  <QWidgetAction>
+#include  <QLineEdit>
+
 class MenuApplications : public QToolButton
 {
     Q_OBJECT
 
 public:
     explicit MenuApplications(QWidget *parent = 0);
-    QMenu *mnuFile;
-
 
 
 public slots:
-    /*virtual*/
 
-  //  /*virtual*/ void setLayout(QHBoxLayout *p);
-    /*virtual*/ void setSize(QSize size);
-
-  //  /*virtual*/ void setKeySequence(QKeySequence sequence);
-  //  /*virtual*/ QString   keySequence();
-  //  /*virtual*/  void setActions(QList<QAction *>list);
-
-    /*virtual*/  void themeChanged()
-    {
-        refreshIcons();
-    }
     void showMenu();
- void loadSettings();
 
-    //    void setListAction( QList<QAction *>actList);
+    void loadSettings();
+
 signals:
 
 private slots:
+
     void afterMenuActivated();
+
     void showHideMenu();
 
     void setupMenu();
 
-
-
     void rechargeMenu();
-
-    void refreshIcons();
 
     void execApplication();
 
-
-
+    void findText(QString text);
 
 private:
+
+    QMenu *mnuFile;
+
     MenuProgrammes *menuProgrammes;
+
     MenuFolders *menuFolders;
-   MenuRecent *mMenuRecent;
-   MenuSystem *menuPower;
-    QList<QAction *>m_actList;
+
+    MenuRecent *mMenuRecent;
+
+    MenuSystem *menuPower;
 
 
-    QToolButton *toolStartHere;
-    bool m_multi;
-    int m_sizeHint;
-    QPoint menuPos;
+    QMenu *mnuFind;
 
-    QString m_ks;
+
+    FindButton *mFindButton;
+   // QLineEdit *findLineEdite;
+
+
+
 };
+
+
 
 #endif // MENUAPPLICATIONS_H

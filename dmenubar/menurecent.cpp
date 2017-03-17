@@ -1,5 +1,6 @@
 #include "menurecent.h"
 #include "utils/edir.h"
+#include "openexec.h"
 #include <QDir>
 #include <QProcess>
 #include <QDebug>
@@ -12,7 +13,7 @@ MenuRecent::MenuRecent(QWidget *parent) :
 {
    this->setTitle(tr("recently used"));
     this->setIcon(QIcon::fromTheme("document-open-recent"));
-
+connect(this,SIGNAL(actionAdded(QAction*)),this,SLOT(addRecentAct(QAction*)));
   loadService();
     loadSettings();
 }
@@ -20,7 +21,6 @@ void MenuRecent::loadService()
 {
     QDir serviceDir(Edir::dataDir()+"/elokab-menu");
      QString path=serviceDir.absoluteFilePath("elokab-recent.desktop");
-
 
 
     QString lc=locale().name().section("_",0,0);
@@ -55,10 +55,11 @@ void MenuRecent::addRecentAct(QAction *act)
     action->setIcon(act->icon());
 
     insertAction(this->actions().first(),action);
+  //  this->actions().swap(0,actions().count()-1);
     connect(action, SIGNAL(triggered()), this, SLOT(lanchApplication()));
 
     if(actions().count()>9)
-        delete actions().last();
+       delete actions().last();
 
     saveSettings();
 }
@@ -68,19 +69,10 @@ void MenuRecent::lanchApplication()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     if (action){
-        //  qDebug()<<"===================="<<action->data().toStringList();
         QStringList data=action->data().toStringList();
-        QString exec=data.at(0).trimmed();
-        //  exec=exec.section(" ",0,0);
-
-        if(exec.contains("su-to-root")){
-            exec=QString("ekbsudo %1 -i %2").arg(exec).arg(data.at(1));
-        }
-        QProcess process;
-        process.setWorkingDirectory(QDir::homePath());
-        //qDebug()<<"MenuProgrammes::lanchApplication()===================="<<exec;
-  //  EMimIcon::launchApplication(appPath);
-      process.startDetached(exec);
+        QString exec=data.at(2).trimmed();
+        qDebug()<<exec;
+        OpenExec::execFile(exec);
 
       swapAction(action);
     }

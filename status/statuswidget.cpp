@@ -9,9 +9,12 @@ StatusWidget::StatusWidget(QWidget *parent) : QWidget(parent)
     mHorizontalLayout = new QHBoxLayout(this);
     mHorizontalLayout->setSpacing(0);
     mHorizontalLayout->setContentsMargins(0, 0, 0, 0);
-
+//    setContentsMargins(0, 0, 0, 0);
+    QFont font=parent->font();
+   font.setPointSize(parent->font().pointSize());
+   setFont(font);
     loadSettings();
-    adjustSize();
+   // adjustSize();
 
 }
 

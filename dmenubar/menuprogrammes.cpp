@@ -19,6 +19,7 @@
 
 #include "menuprogrammes.h"
 #include "utils/desktopfile.h"
+#include "openexec.h"
 #include "utils/edir.h"
 #include <QFile>
 
@@ -260,6 +261,8 @@ void MenuProgrammes::chargeAppDesktop()
         QString oldcomment=dsg.value("Comment",genericName).toString();
         QString comment=dsg.value("Comment["+lc+"]",oldcomment).toString();
 
+
+
         QAction *act=new QAction(this);
         QStringList list;
 
@@ -358,23 +361,33 @@ void MenuProgrammes::refreshIcons()
 
 void MenuProgrammes::lanchApplication()
 {
+
+
+
     QAction *action = qobject_cast<QAction *>(sender());
     if (action){
-        //  qDebug()<<"===================="<<action->data().toStringList();
         QStringList data=action->data().toStringList();
-        QString exec=data.at(0).trimmed();
-        //  exec=exec.section(" ",0,0);
-
-        if(exec.contains("su-to-root")){
-            exec=QString("ekbsudo %1 -i %2").arg(exec).arg(data.at(1));
-        }
-        QProcess process;
-        process.setWorkingDirectory(QDir::homePath());
-        qDebug()<<"MenuProgrammes::lanchApplication()===================="<<exec;
-  //  EMimIcon::launchApplication(appPath);
-      process.startDetached(exec);
-     emit actionExecuted(action);
+        QString exec=data.at(2).trimmed();
+        qDebug()<<exec;
+        OpenExec::execFile(exec);
     }
+    emit actionExecuted(action);
+//        //  qDebug()<<"===================="<<action->data().toStringList();
+//        QStringList data=action->data().toStringList();
+//        QString exec=data.at(0).trimmed();
+//        QString terminal=data.at(3).trimmed();
+//        if(exec.contains("su-to-root")){
+//            exec=QString("ekbsudo %1 -i %2").arg(exec).arg(data.at(1));
+//        }
+//        QProcess process;
+//        process.setWorkingDirectory(QDir::homePath());
+//     if(terminal=="true"){
+//           process.startDetached(QString("xfce4-terminal -e %1").arg(exec));
+//     }else
+//      process.startDetached(exec,QStringList(),QDir::homePath());
+//     //  QDesktopServices::openUrl( QUrl::fromLocalFile(exec) );
+//     emit actionExecuted(action);
+//    }
 }
 
 void MenuProgrammes::rechargeAppDesktop()

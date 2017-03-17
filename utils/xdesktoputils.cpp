@@ -89,7 +89,7 @@ int XDesktop::setCurrent(int numDesktop)
     msg.format = 32;
     msg.data.l[0] =  (unsigned long) numDesktop;
 
-    if (XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), FALSE, (SubstructureRedirectMask | SubstructureNotifyMask) , (XEvent *) &msg) == Success)
+    if (XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), 0, (SubstructureRedirectMask | SubstructureNotifyMask) , (XEvent *) &msg) == Success)
         return EXIT_SUCCESS;
     else
         return EXIT_FAILURE;

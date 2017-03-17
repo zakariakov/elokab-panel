@@ -17,29 +17,33 @@ namespace Ui {
 class PanelWidget;
 }
 
-//#include "X11/Xlib.h"
-//#include <X11/Xatom.h>
+
 #include "etaskbar/dtaskbarwidget.h"
 #include "dsystray/systray.h"
+#include "epager/pager.h"
 class PanelWidget : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit PanelWidget(QWidget *parent = 0);
     ~PanelWidget();
 public slots:
-void reconfigure();
-void exit(){qApp->quit();}
-void showMenu();
+    void reconfigure();
+    void exit(){qApp->quit();}
+    void showMenu();
 
 private:
     Ui::PanelWidget *ui;
-StatusWidget *mStatusWidget;
-DtaskbarWidget *mDtaskbarWidget;
-MenuApplications *mMenuApplications;
-SysTray *mSysTray;
-int m_Position;
+
+    //plugins
+    StatusWidget *mStatusWidget;
+    DtaskbarWidget *mDtaskbarWidget;
+    MenuApplications *mMenuApplications;
+    Pager *mPager;
+    SysTray *mSysTray;
+
+    int m_Position;
 
 private slots:
 
@@ -47,8 +51,8 @@ private slots:
     //X11
     void moveToAllDesktop();
     void setStrut(int top,  int bottom, int topStartX,int topEndX,int bottomStartX, int bottomEndX );
-void loadSettings();
-void loadIconThems();
+    void loadSettings();
+    void loadIconThems();
 
 };
 

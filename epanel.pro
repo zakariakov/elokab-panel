@@ -35,6 +35,7 @@ INCLUDEPATH +=build
 
 SOURCES += main.cpp\
         panelwidget.cpp \
+        panel_adaptor.cpp \
         status/statuslabel.cpp \
         status/statuswidget.cpp \
         etaskbar/dtaskbarwidget.cpp \
@@ -44,27 +45,28 @@ SOURCES += main.cpp\
         utils/desktopfile.cpp \
         dsystray/systray.cpp \
         dsystray/trayicon.cpp \
+        utils/xdesktoputils.cpp \
         dmenubar/menuapplications.cpp \
         dmenubar/menufolders.cpp \
         dmenubar/menuprogrammes.cpp \
         dmenubar/menugen.cpp \
         dmenubar/menusystem.cpp \
-    dmenubar/power/powerdlg.cpp \
-    dmenubar/power/powermain.cpp \
-    panel_adaptor.cpp \
-    dmenubar/menurecent.cpp
-
-
-
-
+        dmenubar/findbutton.cpp \
+        dmenubar/power/powerdlg.cpp \
+        dmenubar/power/powermain.cpp \
+        dmenubar/menurecent.cpp \
+epager/pager.cpp \
+    dmenubar/openexec.cpp
 
 HEADERS  += panelwidget.h \
+            panel_adaptor.h \
             status/statuslabel.h \
             status/statuswidget.h \
             utils/desktopfile.h \
             utils/x11utills.h \
             utils/edir.h \
             utils/mystyle.h \
+            utils/xdesktoputils.h \
             etaskbar/dactiontaskbar.h \
             etaskbar/dtaskbarwidget.h \
             dsystray/systray.h \
@@ -74,19 +76,17 @@ HEADERS  += panelwidget.h \
             dmenubar/menuprogrammes.h \
             dmenubar/menugen.h \
             dmenubar/menusystem.h \
-    dmenubar/power/powerdlg.h \
-    dmenubar/power/powermain.h \
-    panel_adaptor.h \
-    dmenubar/menurecent.h
-
-
-
+            dmenubar/power/powerdlg.h \
+            dmenubar/power/powermain.h \
+            dmenubar/menurecent.h \
+            dmenubar/findbutton.h \
+            epager/pager.h \
+    dmenubar/openexec.h
 
 
 FORMS    += panelwidget.ui
 
 DISTFILES += \
-    car.xml \
     etc/xdg/menus/elokab-applications.menu \
     usr/share/desktop-directories/elokab-audio-video.directory \
     usr/share/desktop-directories/elokab-development.directory \
@@ -112,3 +112,27 @@ DISTFILES += \
     usr/share/elokab/elokab-syspower/Shutdown.desktop \
     usr/share/elokab/elokab-syspower/Suspend.desktop \
     usr/share/elokab/elokab-menu/elokab-recent.desktop
+
+#---------------------------------------------
+#                   INSTALL
+#---------------------------------------------
+ MKDIR = mkdir -p /etc/xdg/elokab
+ MKDIR = mkdir -p /etc/xdg/menus
+ MKDIR = mkdir -p /usr/share/desktop-directories
+ MKDIR = mkdir -p /usr/share/elokab
+
+        target.path = /usr/bin
+
+        data.files =usr/share/elokab/*
+        data.path=/usr/share/elokab/
+
+        dataDirectories.files =usr/share/desktop-directories/*
+        dataDirectories.path =usr/share/desktop-directories/
+
+        xdgMenu.files=etc/xdg/menus/elokab-applications.menu
+        xdgMenu.path=etc/xdg/menus/
+
+ INSTALLS +=target \
+            data \
+            dataDirectories \
+            xdgMenu

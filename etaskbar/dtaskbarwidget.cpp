@@ -48,10 +48,10 @@ DtaskbarWidget::DtaskbarWidget(QWidget *parent):
 
 
 
+  loadSettings();
+    qApp->installNativeEventFilter(this);
 
-  //  qApp->installNativeEventFilter(this);
-
-QTimer::singleShot(100,this,SLOT(init()));
+    QTimer::singleShot(100,this,SLOT(init()));
 
   //   this->setStyleSheet("QWidget{background-color: red  ;}");
 
@@ -60,8 +60,8 @@ QTimer::singleShot(100,this,SLOT(init()));
 void DtaskbarWidget::init()
 {
 
-     qApp->installNativeEventFilter(this);
-      loadSettings();
+    // qApp->installNativeEventFilter(this);
+
 }
 
 bool DtaskbarWidget::nativeEventFilter(const QByteArray &eventType, void *message, long *)
@@ -72,43 +72,18 @@ bool DtaskbarWidget::nativeEventFilter(const QByteArray &eventType, void *messag
         xcb_generic_event_t* event = static_cast<xcb_generic_event_t *>(message);
 
 
-//        if(event->response_type!=wmRef){
-//            wmRef=event->response_type;
-//            if(wmRef==28)
-//                refreshTaskList();
-//        }
+
         switch (event->response_type & ~0x80) {
-        // FIXME: there is no XDamageNotify in xcb?
-        // case XCB_DAMAGE_NOTIFY: break;
-        case XCB_KEYMAP_NOTIFY: {
-           // qDebug() << "keymap";
-            break;
-        }
-        case XCB_DESTROY_NOTIFY: {
-            xcb_destroy_notify_event_t *destroy = reinterpret_cast<xcb_destroy_notify_event_t *>(event);
-           // emit windowClosed(destroy->window);
-            // qDebug() << "windowClosed";
-            break;
-        }
-        case XCB_CONFIGURE_NOTIFY: {
-            xcb_configure_notify_event_t *configure = reinterpret_cast<xcb_configure_notify_event_t *>(event);
-//            emit windowReconfigured(configure->window, configure->x, configure->y,
-//                configure->width, configure->height);
-             //qDebug() << "windowReconfigured";
-            break;
-        }
+
         case XCB_PROPERTY_NOTIFY: {
             xcb_property_notify_event_t *property = reinterpret_cast<xcb_property_notify_event_t*>(event);
-            windowPropertyChanged(property->window, property->atom);
-            // qDebug() << "windowPropertyChanged";
+
+
+                   windowPropertyChanged(property->window, property->atom);
+
             break;
         }
-        case XCB_CLIENT_MESSAGE: {
-            xcb_client_message_event_t *client = reinterpret_cast<xcb_client_message_event_t *>(event);
-           // emit clientMessageReceived(client->window, client->type, client->data.data32);
-            // qDebug() << "clientMessageReceived";
-            break;
-        }
+
         default: break;
         }
 
@@ -122,12 +97,17 @@ void DtaskbarWidget::windowPropertyChanged(unsigned long window, unsigned long a
     if (window ==m_rootWindow) {
 
         if (atom == X11UTILLS::atom("_NET_CLIENT_LIST")){
-             qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_CLIENT_LIST";
+           //  qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_CLIENT_LIST";
              refreshTaskList();
         }
 
         if(atom == X11UTILLS::atom("_NET_ACTIVE_WINDOW")){
-//             qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_ACTIVE_WINDOW";
+           // qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_ACTIVE_WINDOW";
+
+            if(  window==this->winId())
+                return;
+
+
             activeWindowChanged();
         }
 
