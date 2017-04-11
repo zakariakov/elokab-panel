@@ -9,6 +9,8 @@ class OpenExec : public QObject
 public:
     explicit OpenExec(QObject *parent = 0);
 static void execFile(const QString &fileName);
+static void execFolder(const  QString &localDir);
+
 static QString defaultTerminal();
 signals:
 

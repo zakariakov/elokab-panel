@@ -1,4 +1,5 @@
 #include "menufolders.h"
+#include "openexec.h"
 //#include <EIcon>
 #include "utils/edir.h"
 #include <QDesktopServices>
@@ -19,6 +20,7 @@ MenuFolders::MenuFolders(QWidget *parent) :
     chargeMenus();
     refreshIcons();
 }
+
 void MenuFolders::chargeMenus()
 {
 
@@ -82,62 +84,19 @@ void MenuFolders::refreshIcons()
 
  //this->setIcon(EIcon::fromTheme("folder"));
 
-
 }
 
 void MenuFolders::execFolder()
 {
-  qDebug()<<"execFolder" ;
 
+  QAction *action = qobject_cast<QAction *>(sender());
+  if (!action)return;
 
-    QAction *action = qobject_cast<QAction *>(sender());
+  QString localDir=action->data().toString();
 
-    QString costumBrowser=QString();
-
-    QByteArray sS=qgetenv("DESKTOP_SESSION");
-
-    if(sS=="elokab-session"){
-
-        QSettings setting("elokab","elokabsettings");
-        setting.beginGroup("DefaultBrowser");
-         costumBrowser=(setting.value("BROWSER","elokab-fm").toString());
-        setting.endGroup();
-
-    }else{
-
-        QSettings setting;
-        setting.beginGroup("Menu");
-        costumBrowser=(setting.value("Browser","").toString());
-        setting.endGroup();
-    }
-
-
-
-    if(costumBrowser.isEmpty()||costumBrowser=="default") {
-        //تشغيل مجلدات المستخدم كمجلد المستندات والصور وغيرها
-
-        if (action){
-            QString localDir=action->data().toString();
-
-
-            qDebug()<<"defaultBrowser"<<localDir;
-
-            QProcess p;
-            p.startDetached(QString("xdg-open \"%1\"").arg(localDir));
-        }
-    }else{
-        if (action){
-            QString localDir=action->data().toString();
-
-            QStringList list;
-
-
-            list<<localDir;
-            QProcess process;
-            process.startDetached(costumBrowser,list);
-            qDebug()<<"else"<<costumBrowser<<list ;
-        }
-    }
+    OpenExec::execFolder(localDir);
 
     //   this->hide();
 }
+
+

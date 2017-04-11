@@ -56,7 +56,10 @@ SOURCES += main.cpp\
         dmenubar/power/powermain.cpp \
         dmenubar/menurecent.cpp \
 epager/pager.cpp \
-    dmenubar/openexec.cpp
+    dmenubar/openexec.cpp \
+    windowdock.cpp \
+    dmenubar/menuform.cpp \
+    dmenubar/menuclassic.cpp
 
 HEADERS  += panelwidget.h \
             panel_adaptor.h \
@@ -81,10 +84,14 @@ HEADERS  += panelwidget.h \
             dmenubar/menurecent.h \
             dmenubar/findbutton.h \
             epager/pager.h \
-    dmenubar/openexec.h
+    dmenubar/openexec.h \
+    windowdock.h \
+    dmenubar/menuform.h \
+    dmenubar/menuclassic.h
 
 
-FORMS    += panelwidget.ui
+FORMS    += panelwidget.ui \
+    dmenubar/menuform.ui
 
 DISTFILES += \
     etc/xdg/menus/elokab-applications.menu \
@@ -113,6 +120,12 @@ DISTFILES += \
     usr/share/elokab/elokab-syspower/Suspend.desktop \
     usr/share/elokab/elokab-menu/elokab-recent.desktop
 
+#---------------------------------------------
+#                   TRANSLATIONS
+#---------------------------------------------
+TRANSLATIONS    =usr/share/elokab/translations/ar/epanel.ts\
+                 usr/share/elokab/translations/fr/epanel-fm.ts\
+                 usr/share/elokab/translations/en/epanel-fm.ts\
 #---------------------------------------------
 #                   INSTALL
 #---------------------------------------------

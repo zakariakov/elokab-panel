@@ -47,13 +47,14 @@ public:
         this->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
         QFont font=parent->font();
         font.setPointSize(parent->font().pointSize());
-
         setFont(font);
 
         //           QFontMetrics fm(parent->font());
         //           int size=fm.height();
     }
+
 signals:
+
     void activated();
 };
 /**
@@ -71,8 +72,8 @@ public:
 
     void setSize(QSize size);
 
-
-
+public slots:
+    void loadSettings();
 private:
     /*!< قائمة بمجموعة ازرار */
     QButtonGroup * m_GroupBtns;
@@ -103,7 +104,7 @@ private slots:
     void goDesktop(int arg);
     void actvateBtnDesktop();
     void rechargeDesktop();
-    void loadSettings();
+
 protected slots:
 
 };

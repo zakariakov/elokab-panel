@@ -64,7 +64,8 @@ bool dbusCall(const QString &service,const QString &path, const QString &interfa
             msg.arguments().first().isNull() ||
             msg.arguments().first().toBool();
 }
-bool dbusExecCall(const QString & method)
+
+bool dbusExecCall(const QString & method,const QString & arg=QString())
 {
     QDBusInterface dbus(SYSTEMD_SERVICE,SYSTEMD_PATH ,SYSTEMD_INTERFACE, QDBusConnection::systemBus());
     if (!dbus.isValid())
@@ -73,8 +74,10 @@ bool dbusExecCall(const QString & method)
         return false;
     }
     QDBusMessage msg ;
-
+       if(arg.isEmpty())
         msg = dbus.call(method,true);
+       else
+          msg = dbus.call(method,"");
 
        if (msg.arguments().isEmpty() || msg.arguments().first().isNull())
             return true;
@@ -226,15 +229,15 @@ bool PowerMain::CanHibernate()
 //--------------------------------------------------------------------------------------------
 bool PowerMain::CanLogout()
 {
+//TODO fix this
+//    QDBusInterface dbus(TAWHID_SERVICE,
+//                        TAWHID_PATH,
+//                        TAWHID_INTERFACE);
 
-    QDBusInterface dbus(TAWHID_SERVICE,
-                        TAWHID_PATH,
-                        TAWHID_INTERFACE);
-
-    if (!dbus.isValid()) {
-        qDebug() << "elokab session is not valid!";
-        return false;
-    }
+//    if (!dbus.isValid()) {
+//        qDebug() << "elokab session is not valid!";
+//        return false;
+//    }
     return true;
 }
 //--------------------------------------------------------------------------------------------
@@ -299,6 +302,29 @@ bool PowerMain::hibernate()
 //--------------------------------------------------------------------------------------------
 bool PowerMain::logout()
 {
+    QByteArray sS=qgetenv("DESKTOP_SESSION");
+    qDebug()<<"envirenment"<<sS;
+      if(dbusExecCall( "TerminateSession",sS))
+          return true;
+
+//          QDBusInterface dbus(SYSTEMD_SERVICE,SYSTEMD_PATH ,SYSTEMD_INTERFACE, QDBusConnection::systemBus());
+//          if (!dbus.isValid())
+//          {
+//              qWarning() << "dbusCall: QDBusInterface is invalid" << SYSTEMD_SERVICE <<  "TerminateSession";
+//              return false;
+//          }
+//          QDBusMessage msg ;
+
+//              msg = dbus.call("TerminateSession","");
+
+//             if (msg.arguments().isEmpty() || msg.arguments().first().isNull())
+//                  return true;
+
+//              QString response = msg.arguments().first().toString();
+//              qDebug() << "systemd:" << "TerminateSession" << "=" << response;
+
+
+
 
     QDBusInterface dbus(TAWHID_SERVICE,
                         TAWHID_PATH,
@@ -309,6 +335,6 @@ bool PowerMain::logout()
         return false;
     }
     dbus.call("logout");
-    return true;
+    return false;
 }
 //--------------------------------------------------------------------------------------------

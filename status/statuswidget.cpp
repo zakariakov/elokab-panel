@@ -5,7 +5,7 @@
 #include <QDir>
 StatusWidget::StatusWidget(QWidget *parent) : QWidget(parent)
 {
-
+setLayoutDirection(parent->layoutDirection());
     mHorizontalLayout = new QHBoxLayout(this);
     mHorizontalLayout->setSpacing(0);
     mHorizontalLayout->setContentsMargins(0, 0, 0, 0);
@@ -33,7 +33,14 @@ void StatusWidget::loadSettings()
     setting.beginGroup("Main");
     QString mparentColor=setting.value("BgColor","#404244").toString();
     QString mparentFColor=setting.value("FgColor","#FFFFFF").toString();
+    QString fontName=setting.value("FontName").toString();
+    int fontSize=setting.value("FontSize").toInt();
     setting.endGroup();
+
+    QFont font;
+    font.setFamily(fontName);
+    font.setPointSize(fontSize);
+    setFont(font);
 
     setting.beginGroup("Status");
     int STyle=setting.value("STyle").toInt();

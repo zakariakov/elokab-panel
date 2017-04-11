@@ -44,6 +44,119 @@ void OpenExec::execFile(const QString &fileName)
 
 }
 
+bool browserExists(const QString &fm)
+{
+    if(fm.isEmpty())return false;
+    QStringList dirs = QString(getenv("PATH")).split(":");
+
+    foreach(QString dir,dirs)
+    {
+
+            if(QFile::exists(dir+"/"+fm)){
+
+                qDebug()<<"costumBrowser exist"<<dir+"/"+fm;
+                 return true;
+            }
+
+
+    }
+    return false;
+}
+
+void OpenExec::execFolder(const  QString &localDir)
+{
+
+
+  if(localDir.isEmpty())return;
+
+  //var for browser name
+  QString costumBrowser;
+
+  //search in user setting
+  QSettings setting;
+  setting.beginGroup("Menu");
+  //costumBrowser=(setting.value("Browser").toString());
+  setting.endGroup();
+
+  qDebug()<<"costumBrowser user"<<costumBrowser;
+
+  //search in envirenement
+  if(costumBrowser.isEmpty()){
+      QByteArray sS=qgetenv("DESKTOP_SESSION");
+      if(sS=="elokab-session"){
+
+          QSettings setting("elokab","elokabsettings");
+          setting.beginGroup("DefaultBrowser");
+          costumBrowser=(setting.value("BROWSER","elokab-fm").toString());
+          setting.endGroup();
+
+      }
+      //search in enverenment
+      else if(sS=="xfce")
+          costumBrowser="thunar";
+      else if(sS==" plasma-wayland-session"||sS==" plasma-session"||sS.contains("plasma"))
+          costumBrowser="dolphin";
+      else if(sS=="gnome-session"||sS.contains("gnome"))
+          costumBrowser="nautilus";
+      else if(sS=="cinnamon-session")
+          costumBrowser="nimo";
+      else if(sS==("lxsession"))
+          costumBrowser="pcmanfm";
+      //TODO add env
+  }
+  qDebug()<<"costumBrowser env"<<costumBrowser;
+
+  if(!browserExists(costumBrowser))
+      costumBrowser=QString();
+
+  //search in list
+  if(costumBrowser.isEmpty()){
+      //TODO add other browser
+      QStringList list;
+      list<<"elokab-fm"<<"caja"<<"dolphin"<<"thunar"<<"qtfm"<<"nemo"
+         <<"deepin-file-manager"<<" emelfm2"<<" nautilus"
+        << "konqueror"<<"pcmanfm"<<"spacefm"<<"worker" ;
+
+
+          foreach (QString fm, list) {
+
+              if(browserExists(fm)){
+                  costumBrowser=fm;
+                 break;
+              }
+
+
+          }
+
+
+
+  }
+  qDebug()<<"costumBrowser list"<<costumBrowser;
+  //
+  if(costumBrowser.isEmpty()) {
+
+      qDebug()<<"defaultBrowser xdg open"<<localDir;
+
+      QProcess p;
+      p.startDetached(QString("xdg-open \"%1\"").arg(localDir));
+
+  }else{
+     qDebug()<<"defaultBrowser prosess"<<costumBrowser;
+      QStringList list;
+
+      list<<localDir;
+      QProcess process;
+      process.startDetached(costumBrowser,list);
+      qDebug()<<costumBrowser<<list ;
+
+  }
+
+    //   this->hide();
+}
+
+
+
+
 //############################# get prefired terminam ###########################
 QString OpenExec::defaultTerminal()
 {

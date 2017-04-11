@@ -363,7 +363,6 @@ void MenuProgrammes::lanchApplication()
 {
 
 
-
     QAction *action = qobject_cast<QAction *>(sender());
     if (action){
         QStringList data=action->data().toStringList();
@@ -388,6 +387,7 @@ void MenuProgrammes::lanchApplication()
 //     //  QDesktopServices::openUrl( QUrl::fromLocalFile(exec) );
 //     emit actionExecuted(action);
 //    }
+
 }
 
 void MenuProgrammes::rechargeAppDesktop()

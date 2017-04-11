@@ -58,7 +58,7 @@ void MenuRecent::addRecentAct(QAction *act)
   //  this->actions().swap(0,actions().count()-1);
     connect(action, SIGNAL(triggered()), this, SLOT(lanchApplication()));
 
-    if(actions().count()>9)
+    if(actions().count()>21)
        delete actions().last();
 
     saveSettings();

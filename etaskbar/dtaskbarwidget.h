@@ -34,9 +34,6 @@ public slots:
 
 void loadSettings();
 
-          /*virtual*/ void setSize(QSize size);
-
-
 
 private slots:
 
@@ -65,7 +62,7 @@ private:
 
 int mBtnWidth;
            int wmRef;
-
+QWidget *m_parent;
 
 };
 

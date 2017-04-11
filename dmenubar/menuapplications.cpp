@@ -16,15 +16,18 @@
 #include  <QApplication>
 #include  <QDebug>
 #include  <QCompleter>
+
+#define  Classic_Menu 0
+#define  Form_Menu 1
 //------------------------------------------------------------------
 MenuApplications::MenuApplications(QWidget *parent) :
-    QToolButton(parent)
+    QToolButton(parent),menuStyle(0),mMenuForm(0),mMenuClassic(0)
 
 {
     QFont font=parent->font();
-   font.setPointSize(parent->font().pointSize());
-   setFont(font);
-   setContentsMargins(0,0,0,0);
+    font.setPointSize(parent->font().pointSize());
+    setFont(font);
+    setContentsMargins(0,0,0,0);
     this->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
     //this->setTitle(tQTextStreamrUtf8("Applications"));
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus ,false);
@@ -35,74 +38,30 @@ MenuApplications::MenuApplications(QWidget *parent) :
 
 
     setPopupMode(QToolButton::InstantPopup);
-   setCheckable(true);
-   setChecked(true);
-    setupMenu();
-    // keySequence();
+    setCheckable(true);
+    setChecked(true);
 
-}
-
-//------------------------------------------------------------------
-void MenuApplications::setupMenu()
-{
-
-
-mFindButton=new FindButton;
- connect(mFindButton,SIGNAL(findTextChanged(QString)),this,SLOT(findText(QString)));
-    menuProgrammes=new MenuProgrammes(this);
-    connect(menuProgrammes,SIGNAL(menuRecharged()),this,SLOT(rechargeMenu()));
-    mMenuRecent=new MenuRecent(this);
-     connect(menuProgrammes,SIGNAL(actionExecuted(QAction*)),mMenuRecent,SIGNAL(actionAdded(QAction*)));
-   menuPower=new MenuSystem();
-
-    mnuFile=new QMenu(this);
-
-    menuFolders=new MenuFolders(this);
-    mnuFind=new QMenu(this);
-    mnuFind->setTitle(tr("Find"));
-    mnuFind->setIcon(QIcon::fromTheme("edit-find"));
-    connect(mnuFind,SIGNAL(aboutToShow()),mFindButton,SLOT(setFocus()));
-
-
-         setMenu(mnuFile);
-
-    rechargeMenu();
     loadSettings();
-
-}
-
-//------------------------------------------------------------------
-void MenuApplications::rechargeMenu()
-{
-
- //clear();
-     mnuFile->clear();
-
-     mnuFind->clear();
-
-     mnuFind->addAction(mFindButton->actionfind());
-
-     mnuFind->addSeparator();
- //add menus
-     mnuFile->addMenu(mnuFind);
-
-    mnuFile->addSeparator();
-    mnuFile->addMenu(mMenuRecent);
-    foreach (QMenu *m, menuProgrammes->menus) {
-        mnuFile->addMenu(m);
+    if(menuStyle==Classic_Menu){
+        mMenuClassic=new MenuClassic;
+        setMenu(mMenuClassic);
+    } else{
+        mMenuForm=new MenuForm;
+        connect(this,SIGNAL(pressed()),this,SLOT(showForm()));
 
     }
 
-    mnuFile->addSeparator();
-    mnuFile->addMenu(menuFolders);
-    mnuFile->addSeparator();
-
-    mnuFile->addMenu(menuPower);
-
-
-
 }
 
+void MenuApplications::showForm()
+{
+    int x=this->geometry().x();
+    int y=this->geometry().y();
+    int map=this->geometry().width()/2;
+    if(mMenuForm)
+        mMenuForm->open(QPoint(x,y),map);
+
+}
 
 //------------------------------------------------------------------
 void MenuApplications::loadSettings()
@@ -111,57 +70,38 @@ void MenuApplications::loadSettings()
 
     QSettings setting;
     setting.beginGroup("Main");
+    menuStyle=setting.value("MenuStyle",1).toInt();
     QString mparentColor=setting.value("BgColor","#404244").toString();
     QString mparentFColor=setting.value("FgColor","#FFFFFF").toString();
+    QString fontName=setting.value("FontName").toString();
+    int fontSize=setting.value("FontSize").toInt();
     setting.endGroup();
+
+    QFont font;
+    font.setFamily(fontName);
+    font.setPointSize(fontSize);
+    setFont(font);
 
     DesktopFile xdg(setting.fileName(),"Menu");
     int bstyle=(xdg.value("Style",0).toInt());
     QString ButtonBgColor=xdg.value("ButtonBgColor",mparentColor).toString();
     QString ButtonFgColor=xdg.value("ButtonFgColor",mparentFColor).toString();
-    QString MenuBgColor=xdg.value("MenuBgColor","#404244").toString();
-    QString MenuFgColor=xdg.value("MenuFgColor","#FFFFFF").toString();
-    QString MenuBorderColor=xdg.value("MenuBorderColor","#666666").toString();
+
     setText(xdg.value("Text",tr("Start")).toString());
     int radius=xdg.value("BoderRadius",0).toInt();
 
 
 
-    mnuFile->setContentsMargins(radius,radius,radius,radius);
+    this->setContentsMargins(radius,radius,radius,radius);
     QString stButton=MyStyle::taskbarStyle(bstyle).arg(mparentColor).arg(ButtonBgColor).arg(ButtonFgColor);
-    QString stMenu=MyStyle:: menuColor()
-            .arg(MenuBgColor)
-            .arg(MenuFgColor)
-            .arg(MenuBorderColor)
-            .arg(QString::number(radius));
 
 
-    setStyleSheet(stButton+stMenu);
-//    mnuFile-> setPalette(Qt::transparent);
-//    mnuFile->setAttribute(Qt::WA_TranslucentBackground,true);
-    foreach (QMenu *m,menuProgrammes->menus) {
-        m->setStyleSheet(stMenu);
-    }
 
-menuPower->setStyleSheet(stMenu);
+    setStyleSheet(stButton);
+//    this-> setPalette(Qt::transparent);
+//    this->setAttribute(Qt::WA_TranslucentBackground,true);
+
 }
-
-//------------------------------------------------------------------
-void MenuApplications::execApplication()
-{
-    QAction *action = qobject_cast<QAction *>(sender());
-    if (action){
-        QString data=action->data().toString();
-        QString exec=data.section("|",0,0);
-        QProcess process;
-        process.setWorkingDirectory(QDir::homePath());
-
-        process.startDetached(exec);
-        //   qDebug()<<exec;
-    }
-}
-
-
 
 //------------------------------------------------------------------
 void MenuApplications::afterMenuActivated()
@@ -170,72 +110,44 @@ void MenuApplications::afterMenuActivated()
     QRect screen = QApplication::desktop()->availableGeometry();
     int posy;
     QPoint ps=mapToGlobal(QPoint(this->rect().left(),this->rect().top()));
-    if(ps.y()>=screen.height()){
-        posy= this->rect().top()- mnuFile->sizeHint().height();;
+    if(menuStyle==Classic_Menu){
+        if(!mMenuClassic)return;
+
+        if(ps.y()>=screen.height()){
+            posy= this->rect().top()- mMenuClassic->sizeHint().height();;
+        }else{
+            posy= this->rect().bottom();
+        }
+
+        QPoint mpos;
+
+        mpos=mapToGlobal(QPoint(this->rect().right()-mMenuClassic->sizeHint().width(),posy));
+
+        mMenuClassic->exec(mpos);
+        mMenuClassic->activateWindow();
+        X11UTILLS::raiseWindow(mMenuClassic->winId());
+        mMenuClassic->setFocus();
     }else{
-        posy= this->rect().bottom();
+         if(!mMenuForm)return;
+         showForm();
+         mMenuForm->setFocus();
     }
-
-    QPoint mpos;
-
-        mpos=mapToGlobal(QPoint(this->rect().right()-mnuFile->sizeHint().width(),posy));
-
-
-    mnuFile->exec(mpos);
-    mnuFile->activateWindow();
-
-     X11UTILLS::raiseWindow(mnuFile->winId());
-     mnuFile->setFocus();
-
 }
 
-//------------------------------------------------------------------
-void MenuApplications::showHideMenu()
-{
-    if (mnuFile && mnuFile->isVisible())
-        mnuFile->hide();
-    else
-        showMenu();
-}
 
 //------------------------------------------------------------------
 void MenuApplications::showMenu()
 {
-
-    mnuFile->activateWindow();
-    mnuFile->setFocus();
+    if(menuStyle==Classic_Menu){
+        if(!mMenuClassic)return;
+        mMenuClassic->activateWindow();
+        mMenuClassic->setFocus();
+    }else{
+        if(!mMenuForm)return;
+        mMenuForm ->activateWindow();
+        mMenuForm->setFocus();
+    }
 
     QTimer::singleShot(10, this, SLOT(afterMenuActivated()));
 }
-
-//------------------------------------------------------------------Find
-void MenuApplications::findText(QString text)
-{
-
-    foreach (QAction *a, mnuFind->actions()) {
-
-        if(a->objectName()=="ActionWidget")
-            continue;
-
-        mnuFind->removeAction(a);
-    }
-
-    if (text.isEmpty()) return;
-
-    foreach (QMenu *m, menuProgrammes->menus) {
-        foreach (QAction *a,   m->actions()) {
-            QStringList data=a->data().toStringList();
-            QString exec=data.at(0);
-            if(exec.toLower().contains(text)
-                    ||a->text().toLower().contains(text))
-            {
-                mnuFind->addAction(a);
-            }
-        }
-    }
-
-}
-
-
-
 

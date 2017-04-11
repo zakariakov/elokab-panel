@@ -16,7 +16,7 @@ StatusLabel::StatusLabel(QColor bgColor,
     font.setPointSize(parent->font().pointSize());
     setFont(font);
 
-    //   setLayoutDirection( parent->layoutDirection());
+     setLayoutDirection( qApp->layoutDirection());
     mLabel=text;
     setText(mLabel);
 
@@ -42,13 +42,14 @@ StatusLabel::StatusLabel(QColor nextColor, QColor prevColor, QWidget *parent, in
     font.setPointSize(parent->font().pointSize());
     setFont(font);
 
-    //    setLayoutDirection( parent->layoutDirection());
+       setLayoutDirection( qApp->layoutDirection());
 
-
+qDebug()<<"setLayoutDirection"<<layoutDirection();
     setMinimumWidth(7);
 
 if(style>0&&style<6){
-     QString styleSt;
+
+    QString styleSt;
     if(parent->isRightToLeft())
         styleSt= MyStyle::statusStyle(style).arg(prevColor.name()).arg(nextColor.name());
     else

@@ -2,11 +2,10 @@
 #define MENUAPPLICATIONS_H
 
 
-#include "findbutton.h"
-#include "menuprogrammes.h"
-#include "menufolders.h"
-#include "menusystem.h"
-#include "menurecent.h"
+#include "menuclassic.h"
+
+#include "menuform.h"
+
 #include <QWidget>
 #include <QMenu>
 #include <QMenuBar>
@@ -33,36 +32,20 @@ public slots:
 signals:
 
 private slots:
-
+void showForm();
     void afterMenuActivated();
 
-    void showHideMenu();
 
-    void setupMenu();
 
-    void rechargeMenu();
-
-    void execApplication();
-
-    void findText(QString text);
 
 private:
 
-    QMenu *mnuFile;
-
-    MenuProgrammes *menuProgrammes;
-
-    MenuFolders *menuFolders;
-
-    MenuRecent *mMenuRecent;
-
-    MenuSystem *menuPower;
 
 
-    QMenu *mnuFind;
+MenuForm *mMenuForm;
+MenuClassic *mMenuClassic;
+int menuStyle;
 
-
-    FindButton *mFindButton;
    // QLineEdit *findLineEdite;
 
 

@@ -26,15 +26,15 @@ public:
       switch (act)
       {
       case Logout:
-          return  QIcon::fromTheme("system-log-out");
+          return  QIcon::fromTheme("system-log-out",QIcon(":/icons/system-log-out"));
       case Hibernate:
-          return QIcon::fromTheme("system-hibernate");
+          return QIcon::fromTheme("system-hibernate",QIcon(":/icons/system-hibernate"));
       case Reboot:
-          return  QIcon::fromTheme("system-reboot");
+          return  QIcon::fromTheme("system-reboot",QIcon(":/icons/system-reboot"));
       case Shutdown:
-          return QIcon::fromTheme("system-shutdown");
+          return QIcon::fromTheme("system-shutdown",QIcon(":/icons/system-shutdown"));
       case Suspend:
-          return QIcon::fromTheme("system-suspend");
+          return QIcon::fromTheme("system-suspend",QIcon(":/icons/system-suspend"));
 
 
       }

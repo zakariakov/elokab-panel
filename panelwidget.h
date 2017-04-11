@@ -1,7 +1,7 @@
-﻿#ifndef PANELWIDGET_H
+#ifndef PANELWIDGET_H
 #define PANELWIDGET_H
 #include "status/statuswidget.h"
-
+#include <QWindow>
 #include "dmenubar/menuapplications.h"
 #include <QWidget>
 #include <QX11Info>
@@ -11,8 +11,8 @@
 #include <QDebug>
 #include <QProcess>
 #include <QLayout>
-#include <QAbstractNativeEventFilter>
-#include "xcb/xcb.h"
+//#include <QAbstractNativeEventFilter>
+//#include "xcb/xcb.h"
 namespace Ui {
 class PanelWidget;
 }
@@ -32,6 +32,9 @@ public slots:
     void reconfigure();
     void exit(){qApp->quit();}
     void showMenu();
+void setDock ();
+//unsigned int getWindowPID(Window winID) ;
+
 
 private:
     Ui::PanelWidget *ui;
@@ -44,7 +47,7 @@ private:
     SysTray *mSysTray;
 
     int m_Position;
-
+QWindow *tlwWindow ;
 private slots:
 
     void resizePanel();

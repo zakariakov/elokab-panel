@@ -2,7 +2,12 @@
 #include "ui_panelwidget.h"
 #include "panelwidget.h"
 #include <QSettings>
+  #include <QtPlatformHeaders/QXcbWindowFunctions>
 //#include "etaskbar/dtaskbarwidget.h"
+//#include <X11/Xlib-xcb.h>
+//#include <xcb/xcb_ewmh.h>
+//#include "xcb/xproto.h"
+//#include<xcb/xcb.h>
 
 PanelWidget::PanelWidget(QWidget *parent) :
     QWidget(parent),
@@ -15,45 +20,54 @@ PanelWidget::PanelWidget(QWidget *parent) :
     if(sS=="i3")
         setWindowFlags( Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     else
-        setWindowFlags(/*Qt::BypassWindowManagerHint |*/ Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        setWindowFlags(/*Qt::BypassWindowManagerHint | */Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
-    setAttribute(Qt::WA_X11NetWmWindowTypeDock);
+    //TODO FIX This
+    // setAttribute(Qt::WA_X11NetWmWindowTypeDock);
+
+    this->winId(); //have to create the QWindow
+    tlwWindow = this->windowHandle();
+    QXcbWindowFunctions::setWmWindowType(tlwWindow, QXcbWindowFunctions::Dock);
+
+    setDock ();
     setAttribute(Qt::WA_AlwaysShowToolTips);
-  setAttribute(Qt::WA_X11DoNotAcceptFocus);
+    setAttribute(Qt::WA_X11DoNotAcceptFocus);
     setWindowTitle(tr("Panel"));
     setObjectName("PanelWidget");
-    setPalette(Qt::transparent);
-    setAttribute(Qt::WA_TranslucentBackground,true);
+    //      setPalette(Qt::transparent);
+    //  setAttribute(Qt::WA_TranslucentBackground,true);
+
+//setLayoutDirection(qApp->layoutDirection());
 
     ui->setupUi(this);
     loadIconThems();
-    QFontMetrics fm(font());
-    int size=fm.height();
 
-    setGeometry(0,0,50,size+5);
-    setMaximumHeight(size);
+
+
+    mSysTray=new SysTray;
     mMenuApplications =new MenuApplications(this);
-  mStatusWidget=new StatusWidget(this);
+    mStatusWidget=new StatusWidget(this);
     mDtaskbarWidget=new DtaskbarWidget(this);
-    mSysTray=new SysTray(this);
+
     mPager=new Pager(this);
 
     ui->horizontalLayout->setSpacing(0);
     ui->horizontalLayout->addWidget(mMenuApplications);
-   ui->horizontalLayout->addWidget(mPager);
+    ui->horizontalLayout->addWidget(mPager);
     ui->horizontalLayout->addWidget(mDtaskbarWidget);
     ui->horizontalLayout->addWidget(mStatusWidget);
-   ui->horizontalLayout->addWidget(mSysTray);
+    ui->horizontalLayout->addWidget(mSysTray);
 
-
-
+ loadSettings();
+    //-----------------------------------------------------------------
+    connect(QApplication::desktop(),SIGNAL(workAreaResized(int)),this,SLOT(resizePanel()));
     moveToAllDesktop();
-    loadSettings();
+
     //testingh
     //adjustSize();
 
-//connect( mInterface,SIGNAL(themChanged()),this,SLOT(reconfigureThemes()));
-
+    //connect( mInterface,SIGNAL(themChanged()),this,SLOT(reconfigureThemes()));
+ resizePanel();
 
 }
 
@@ -65,19 +79,63 @@ PanelWidget::~PanelWidget()
 }
 
 
+
+void PanelWidget::setDock ()
+{
+    if (winId() == 0)
+        return ;
+
+    if (!QX11Info::display())
+        return ;
+    //unsigned int wid=getWindowPID(winId());
+
+    Atom a[2] = { None, None };
+    a[0] = XInternAtom (QX11Info::display(), "_NET_WM_WINDOW_TYPE_DOCK", false);
+    Atom a2 = XInternAtom (QX11Info::display(), "_NET_WM_WINDOW_TYPE", false);
+
+    XChangeProperty (QX11Info::display(),
+                     tlwWindow->winId(),
+                     a2, XA_ATOM, 32, PropModeReplace, (unsigned char *) a, 1);
+
+
+    //---------------------------------------------------------------------------TODO
+    //return;
+
+    //    xcb_connection_t *c = XGetXCBConnection( QX11Info::display());
+    //    xcb_ewmh_connection_t EWMH;
+    //    xcb_intern_atom_cookie_t *EWMHCookie = xcb_ewmh_init_atoms(c, &EWMH);
+    //    if (! xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL)) {
+
+    //        return ;
+    //    }
+
+
+    //    xcb_change_property(c,       /* Connection to the X server */
+    //                        XCB_PROP_MODE_REPLACE,     /* Property mode */
+    //                        wid,   /* Window */
+    //                        EWMH._NET_WM_WINDOW_TYPE, /* Property to change */
+    //                        XCB_ATOM_ATOM,     /* Type of the property */
+    //                        32,   /* Format of the property (8, 16, 32) */
+    //                        1, /* Length of the data parameter */
+    //                        &(EWMH._NET_WM_WINDOW_TYPE_DOCK));    /* Data */
+    //----------------------------------------------------------------------------
+}
+
+
 void PanelWidget::reconfigure()
 {
-    qDebug()<<"called reconfigura";
+
     loadSettings();
-   mMenuApplications->loadSettings();
-  mDtaskbarWidget->loadSettings();
-   mStatusWidget->loadSettings();
-   // resizePanel();
+    mMenuApplications->loadSettings();
+    mDtaskbarWidget->loadSettings();
+    mStatusWidget->loadSettings();
+    mPager->loadSettings();
+     resizePanel();
 }
 void PanelWidget::showMenu()
 {
     if(mMenuApplications)
-       mMenuApplications->showMenu();
+        mMenuApplications->showMenu();
 }
 
 void PanelWidget::loadSettings()
@@ -86,15 +144,32 @@ void PanelWidget::loadSettings()
     //    FgColor=#FFFFFF
     //    Boder=false
     //    BoderColor=#FF5500
+
     QSettings setting;
     setting.beginGroup("Main");
+    QString fontName=setting.value("FontName").toString();
+    int fontSize=setting.value("FontSize").toInt();
+
+    QFont font;
+    font.setFamily(fontName);
+    font.setPointSize(fontSize);
+    setFont(font);
+
+    QFontMetrics fm(font);
+    int size=fm.height();
+    setMaximumHeight(size+5);
+if(mSysTray)
+    mSysTray->setIconSize(QSize(size+5,size+5));
+
     QString bgColor=setting.value("BgColor","#404244").toString();
     QString FgColor=setting.value("FgColor","#FFFFFF" ).toString();
 
     m_Position=setting.value("Position",1).toInt();
 
+
+
     //TODO FIX ALPHA IN mystyle.h and all moduls
-   /*
+    /*
     int Alpha=setting.value("Alpha",255).toInt();
     QColor bg=QColor(bgString);
     bg.setAlpha(Alpha);
@@ -111,7 +186,7 @@ void PanelWidget::loadSettings()
 
 
 
-    resizePanel();
+
 
 }
 
@@ -165,6 +240,7 @@ void PanelWidget::resizePanel()
     qDebug()<<"   widget panel resized: "<<rect;
 
     setMaximumWidth(rect.width());
+    setMinimumHeight(rect.height());
     //  m_rootWindow = QX11Info::appRootWindow();
 
 }
@@ -222,9 +298,14 @@ void PanelWidget::setStrut(int top,  int bottom,
 
 void PanelWidget::moveToAllDesktop()
 {
+    unsigned long desktop = true ? 0xFFFFFFFF : 0;
 
+    XChangeProperty(QX11Info::display(), tlwWindow->winId(), XFatom("_NET_WM_DESKTOP"), XA_CARDINAL, 32, PropModeReplace, reinterpret_cast<const unsigned char*>(&desktop), 1);
+
+
+    //TODO FIX THIS
     XClientMessageEvent msg;
-    msg.window = this->winId();
+    msg.window = tlwWindow->winId();
     msg.type = ClientMessage;
     msg.message_type = XFatom(/*"_NET_WM_WINDOW_TYPE_DOCK" */"_NET_WM_DESKTOP");
     msg.send_event = true;
@@ -233,10 +314,8 @@ void PanelWidget::moveToAllDesktop()
     msg.data.l[0] = -1;
     //TODO FIX This
     XSendEvent(QX11Info::display(), QX11Info::appRootWindow(0), 0, (SubstructureRedirectMask | SubstructureNotifyMask) , (XEvent *) &msg);
-    XChangeSaveSet(
-        QX11Info::display(),
-        this->winId(),
-        XFatom(/*"_NET_WM_WINDOW_TYPE_DOCK" */"_NET_WM_DESKTOP")	);
+
+
 }
 
 //! -x11-اشارات مكتبة  -------------------------------------------------- */
@@ -266,7 +345,10 @@ void PanelWidget::loadIconThems()
     if(icnThem=="hicolor"||icnThem.isEmpty()){
 
         QStringList failback;
-        failback << "oxygen"<< "Mint-X"<< "Humanity"<< "Tango"<< "Prudence-icon"<< "elementary"<< "gnome"<<"Adwaita";
+        failback << "oxygen"<< "Mint-X"
+                 << "Humanity"
+                 << "Prudence-icon"<< "elementary"
+                 <<"Adwaita"<<"breeze"<< "gnome";
 
         QDir dir("/usr/share/icons/");
         foreach (QString s, failback)

@@ -23,7 +23,7 @@ original code  http://razor-qt.org
 #include <xcb/damage.h>
 #include "utils/x11utills.h"
 #include <X11/X.h>
-#include <xcb/xcb_event.h>
+
 
 
 
@@ -44,21 +44,24 @@ SysTray::SysTray( QWidget *parent):
     mIconSize(TRAY_ICON_SIZE_DEFAULT, TRAY_ICON_SIZE_DEFAULT),
     mDisplay(QX11Info::display())
 {
-    QFont font=parent->font();
-   font.setPointSize(parent->font().pointSize());
-   setFont(font);
+//    QFont font=parent->font();
+//   font.setPointSize(parent->font().pointSize());
+//   setFont(font);
    setContentsMargins(0,0,0,0);
 
+
     mLayout = new QHBoxLayout(this);
-    mLayout->setContentsMargins(0,0,0,0);
+    mLayout->setContentsMargins(3,0,3,0);
     mLayout->setSpacing(3);
     setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
 
     _NET_SYSTEM_TRAY_OPCODE = X11UTILLS::atom("_NET_SYSTEM_TRAY_OPCODE");
+   qApp->installNativeEventFilter(this);
     // Init the selection later just to ensure that no signals are sent until
     // after construction is done and the creating object has a chance to connect.
     QTimer::singleShot(0, this, SLOT(startTray()));
-     setStyleSheet("background-color: rgb(255, 170, 255);");
+
+//   setStyleSheet("background-color: rgb(255, 170, 255);");
 }
 
 
@@ -76,6 +79,8 @@ SysTray::~SysTray()
  ************************************************/
 bool SysTray::nativeEventFilter(const QByteArray &eventType, void *message, long *)
 {
+
+
     if (eventType != "xcb_generic_event_t")
         return false;
 
@@ -90,11 +95,7 @@ bool SysTray::nativeEventFilter(const QByteArray &eventType, void *message, long
             clientMessageEvent(event);
             break;
 
-//        case ConfigureNotify:
-//            icon = findIcon(event->xconfigure.window);
-//            if (icon)
-//                icon->configureEvent(&(event->xconfigure));
-//            break;
+
 
         case DestroyNotify: {
             unsigned long event_window;
@@ -308,7 +309,7 @@ void SysTray::startTray()
     qDebug() << "Systray started";
     mValid = true;
 
-    qApp->installNativeEventFilter(this);
+
 
 }
 

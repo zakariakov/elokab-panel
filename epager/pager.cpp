@@ -56,6 +56,7 @@ Pager::Pager( QWidget* parent)
 
     loadSettings();
     qApp->installNativeEventFilter(this);
+
     rechargeDesktop();
 
 }
@@ -65,8 +66,22 @@ void Pager::loadSettings()
     QSettings setting;
     setting.beginGroup("Main");
     QString mparentColor=setting.value("BgColor","#404244").toString();
+    QString fontName=setting.value("FontName").toString();
+    int fontSize=setting.value("FontSize").toInt();
     setting.endGroup();
 
+    QFont font;
+    font.setFamily(fontName);
+    font.setPointSize(fontSize);
+    setFont(font);
+
+    foreach (QAbstractButton * b, m_GroupBtns->buttons())
+    {
+
+       b->setFont(font);
+
+
+    }
     //get setting for the taskbar
     setting.beginGroup("Pager");
 
@@ -130,6 +145,7 @@ void Pager::rechargeDesktop()
 {
     int count = qMax(XDesktop::count(), 1);
 
+
     if (m_DeskCount != count)
     {
 
@@ -147,7 +163,11 @@ void Pager::rechargeDesktop()
     }
 
     int activeDesk = qMax(XDesktop::active(), 0);
-    m_GroupBtns->button(activeDesk)->setChecked(true);
+
+    qDebug()<<"Pager::rechargeDesktop() activeDesk: "<<activeDesk<<"DeskCountt: "<<m_DeskCount;
+      if(m_GroupBtns->buttons().count()>0 &&
+              activeDesk < m_GroupBtns->buttons().count())
+         m_GroupBtns->button(activeDesk)->setChecked(true);
 
 }
 
@@ -236,7 +256,7 @@ void Pager::actvateBtnDesktop()
         rechargeDesktop();
 }
 
-/*************************Virtual**********************************/
+
 
 void Pager::goDesktop(int arg)
 {

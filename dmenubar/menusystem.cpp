@@ -146,17 +146,17 @@ void MenuSystem::logout(){
 
 void MenuSystem::lockScreen()
 {
-//          QProcess process;
-//          process.startDetached("xdg-screensaver", QStringList() << "lock");
+
 //          //-------------------
           QDBusInterface dbus("org.elokab.ScreenSaver",
                               "/org/elokab/ScreenSaver",
                               "org.elokab.ScreenSaver");
 
           if (!dbus.isValid()) {
-              qDebug() << "QDBusInterface is not valid!";
+              qDebug() << "QDBusInterface is not valid! starting xscreensaver-command";
                    QProcess process;
-                   process.startDetached("elokab-ssaver", QStringList() << "lock");
+                  // process.startDetached("xscreensaver-command", QStringList() << "-lock");
+                      process.startDetached("xdg-screensaver", QStringList() << "lock");
 
               return ;
           }

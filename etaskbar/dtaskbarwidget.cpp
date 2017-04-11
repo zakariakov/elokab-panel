@@ -15,12 +15,14 @@ original code  http://razor-qt.org
 #include <QDebug>
 #include "utils/x11utills.h"
 #include "xcb/xcb.h"
+
 #define TEXTBICON 0
 #define ICONONLY 1
 
 DtaskbarWidget::DtaskbarWidget(QWidget *parent):
     QWidget(parent)
 {
+
     QFont font=parent->font();
     font.setPointSize(parent->font().pointSize());
     setFont(font);
@@ -38,7 +40,7 @@ DtaskbarWidget::DtaskbarWidget(QWidget *parent):
 
     horizontalSpacer = new QSpacerItem(5, 5, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-   m_horizontalLayout->addItem(horizontalSpacer);
+    m_horizontalLayout->addItem(horizontalSpacer);
 
     //     connect(KWindowSystem::self(), SIGNAL(stackingOrderChanged()), SLOT(refreshTaskList()));
     //        connect(KWindowSystem::self(), static_cast<void (KWindowSystem::*)(WId, NET::Properties, NET::Properties2)>(&KWindowSystem::windowChanged)
@@ -48,12 +50,12 @@ DtaskbarWidget::DtaskbarWidget(QWidget *parent):
 
 
 
-  loadSettings();
+    loadSettings();
     qApp->installNativeEventFilter(this);
 
     QTimer::singleShot(100,this,SLOT(init()));
 
-  //   this->setStyleSheet("QWidget{background-color: red  ;}");
+    //   this->setStyleSheet("QWidget{background-color: red  ;}");
 
 }
 
@@ -79,7 +81,7 @@ bool DtaskbarWidget::nativeEventFilter(const QByteArray &eventType, void *messag
             xcb_property_notify_event_t *property = reinterpret_cast<xcb_property_notify_event_t*>(event);
 
 
-                   windowPropertyChanged(property->window, property->atom);
+            windowPropertyChanged(property->window, property->atom);
 
             break;
         }
@@ -92,21 +94,18 @@ bool DtaskbarWidget::nativeEventFilter(const QByteArray &eventType, void *messag
 
     return false;
 }
+
 void DtaskbarWidget::windowPropertyChanged(unsigned long window, unsigned long atom)
 {
     if (window ==m_rootWindow) {
 
         if (atom == X11UTILLS::atom("_NET_CLIENT_LIST")){
-           //  qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_CLIENT_LIST";
-             refreshTaskList();
+            //  qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_CLIENT_LIST";
+            refreshTaskList();
         }
 
         if(atom == X11UTILLS::atom("_NET_ACTIVE_WINDOW")){
-           // qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_ACTIVE_WINDOW";
-
-            if(  window==this->winId())
-                return;
-
+            // qDebug()<<"DtaskbarWidget::windowPropertyChanged   _NET_ACTIVE_WINDOW";
 
             activeWindowChanged();
         }
@@ -115,10 +114,10 @@ void DtaskbarWidget::windowPropertyChanged(unsigned long window, unsigned long a
     }
 
 
-           if(mButtonsHash.contains(window)){
+    if(mButtonsHash.contains(window)){
 
-               mButtonsHash[window]->windowPropertyChanged(atom);
-            }
+        mButtonsHash[window]->windowPropertyChanged(atom);
+    }
 
 }
 
@@ -130,7 +129,7 @@ void DtaskbarWidget::setIconStyle()
     foreach (DActionTaskbar *btn, allButtons)
     {
         btn->setToolButtonStyle(mButtonStyle);
-     //   btn->setIconSize(m_size);
+        //   btn->setIconSize(m_size);
         if(m_iconStyle==TEXTBICON){
 
             btn->setMaximumWidth(QWIDGETSIZE_MAX);
@@ -147,8 +146,20 @@ void DtaskbarWidget::loadSettings()
     QSettings setting;
     setting.beginGroup("Main");
     QString mparentColor=setting.value("BgColor","#404244").toString();
+    QString fontName=setting.value("FontName").toString();
+    int fontSize=setting.value("FontSize").toInt();
     setting.endGroup();
 
+    QFont font;
+    font.setFamily(fontName);
+    font.setPointSize(fontSize);
+    setFont(font);
+    QFontMetrics fm(font);
+    int size=fm.height();
+    foreach (DActionTaskbar *btn, mButtonsHash) {
+        btn->setFont(font);
+        btn->setIconSize(QSize(size,size));
+    }
     //get setting for the taskbar
     setting.beginGroup("Taskbar");
     m_iconStyle=setting.value("IconStyle",0).toInt();
@@ -167,13 +178,14 @@ void DtaskbarWidget::loadSettings()
     }
 
     m_size=(QSize(IconSize,IconSize));
-  QString  mystyle;
-  if(Style<1||Style>5)
-      mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor);
-  else
-      mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor).arg(ActiveBgColor).arg(ActiveFgColor);
+    QString  mystyle;
+    if(Style<1||Style>5)
+        mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor);
+    else
+        mystyle=  MyStyle::taskbarStyle(Style).arg(mparentColor).arg(ActiveBgColor).arg(ActiveFgColor);
 
     setStyleSheet(mystyle);
+
 
     refreshTaskList();
 }
@@ -184,17 +196,9 @@ void DtaskbarWidget::loadSettings()
 void DtaskbarWidget::refreshTaskList()
 {
 
-    //blockSignals(true);
 
     //              قائمة مؤقة بجميع معرفات النوافذ الحاضرة
-   QList<unsigned long> listWindow = X11UTILLS::getClientList();
-//    if(listWindow.count()==mButtonsHash.count())
-//    {
-
-//        activeWindowChanged();
-//        //   blockSignals(false);
-//        return;
-//    }
+    QList<unsigned long> listWindow = X11UTILLS::getClientList();
 
 
     //                  حذف جميع الازرار ومعرفاتها السابقة
@@ -231,13 +235,13 @@ void DtaskbarWidget::refreshTaskList()
         //            اضافة ازر للقائمة
         mButtonsHash.insert(wnd, btn);
 
-  qDebug()<<mButtonsHash.count() <<this->width();
+        qDebug()<<mButtonsHash.count() <<this->width();
 
-  //TODO fix This
-   //     if(mButtonsHash.count() *mBtnWidth <this->width()-20)
+        //TODO fix This
+        //     if(mButtonsHash.count() *mBtnWidth <this->width()-20)
 
-         //        اضافة الزر للبنال
-            m_horizontalLayout->addWidget(btn);
+        //        اضافة الزر للبنال
+        m_horizontalLayout->addWidget(btn);
 
 
     }
@@ -259,11 +263,11 @@ void DtaskbarWidget::refreshTaskList()
             btn->setMinimumWidth(btn->sizeHint().width()+7);
 
         }
-         btn->adjustSize();
+        btn->adjustSize();
     }
 
     activeWindowChanged();
-//adjustSize();
+    //adjustSize();
     //blockSignals(false);
 
 }
@@ -274,6 +278,9 @@ void DtaskbarWidget::activeWindowChanged()
 
     //        البحث عن النافذة المفعلة
     unsigned long window =X11UTILLS::getActiveAppWindow();
+
+    if( ! window)
+        return;
 
 
     foreach (DActionTaskbar *btn,mButtonsHash){
@@ -289,9 +296,9 @@ void DtaskbarWidget::activeWindowChanged()
     DActionTaskbar* toolbtn =0;
     if (mButtonsHash.contains(window)){
         toolbtn=mButtonsHash.value(window);
-         m_activeWindow=window;
+        m_activeWindow=window;
         toolbtn->setActiveWin(true);
-     // toolbtn->setChecked(true);
+        // toolbtn->setChecked(true);
 
     }
 
@@ -319,12 +326,4 @@ void DtaskbarWidget::wheelEvent(QWheelEvent* event)
 
 }
 
-
-void DtaskbarWidget::setSize(QSize size)
-{
-    m_size=size;
-
-    this->setMinimumHeight(m_size.height());
-    refreshTaskList();
-}
 
